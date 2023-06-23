@@ -1,1 +1,2 @@
 # JavaTesting
+Java example projects
