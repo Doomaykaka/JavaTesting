@@ -1,0 +1,66 @@
+plugins {
+	id "org.springframework.boot" version "2.7.7"
+	id "com.diffplug.spotless" version "6.13.0"
+}
+
+apply plugin: 'java' //подключаем работу с java
+apply plugin: 'eclipse' //подключаем работу с eclipse
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'war'
+apply plugin: 'checkstyle'
+
+ext {
+    springBootVersion = '2.7.7'
+}
+
+//указание репозиториев , в которых будут искаться зависимости
+repositories{
+	mavenCentral()
+}
+
+//упаковка проекта в jar
+bootJar {
+	mainClass = 'main.java.online_testing_service.Main'
+	if (project.hasProperty('ver')) {
+		version =  project.getProperty('ver')
+    }else{
+		version =  '0.0.0'
+	}
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+//указание зависимостей проекта
+dependencies{
+	implementation files('lib/postgresql-42.4.0.jar')
+	implementation 'org.springframework.boot:spring-boot-starter-web:2.7.7' //Spring framework
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.7.4' //Viewport
+	compileOnly'org.projectlombok:lombok:1.18.22' //Smart annotations
+	annotationProcessor 'org.projectlombok:lombok:1.18.22'
+	implementation 'com.diffplug.spotless:spotless-plugin-gradle:6.13.0'
+}
+
+//статический анализатор
+checkstyle {
+    toolVersion '10.3.3'
+    configFile file("config/checkstyle/checkstyle.xml")
+    ignoreFailures = true
+    maxWarnings = 0
+    maxErrors = 0
+}
+
+checkstyleMain {
+    source ='src/main/java'
+}
+
+//форматтер
+spotless {
+  java {
+    importOrder() //нормолизуем порядок импорта библиотек
+    removeUnusedImports() //удаляем неиспользуемые импорты библиотек
+    eclipse() //указываем реализацию форматтера кода
+    formatAnnotations() //исправляем использование аннотаций
+  }
+}
+
