@@ -5,7 +5,7 @@ Plugins:
 	Eclipse XML Editors and Tools 3.29 https://marketplace.eclipse.org/content/eclipse-xml-editors-and-tools
 	SQL Editor 1.4.0 https://marketplace.eclipse.org/content/sql-editor
 Settings:
-	java--
+	Java--
 		 |
 		 Editor--
 				 |
@@ -20,3 +20,11 @@ Settings:
 						 Color and font theme = Default (current)
 						 Use mixed fonts and colors for labels
 						 Show most recently used tabs
+	Java--
+		  |
+		  CodeStyle--
+					 Formatter--Active profile--edit--
+													  |
+													  Identention--Tab policy = Spaces only
+																   Identention size = 4
+																   Tab size = 4
