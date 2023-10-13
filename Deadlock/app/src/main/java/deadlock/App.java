@@ -5,6 +5,10 @@ package deadlock;
 
 public class App {
     public static void main(String[] args) {
+        // Код без Deadlock
+
+        System.out.println("--- Код без Deadlock ---");
+
         final String res1 = "my sample text";
         final String res2 = "some other text";
 
@@ -13,15 +17,20 @@ public class App {
             public void run() {
                 synchronized (res1) {
                     System.out.println("Поток 1 навесил замок на Ресурс 1");
-                    try {
-                        Thread.sleep(100);
-                    } catch (Exception e) {
-                    }
-
-                    synchronized (res2) {
-                        System.out.println("Поток 1 навесил замок на Ресурс 2");
-                    }
                 }
+
+                System.out.println("Поток 1 снял замок с Ресурса 1");
+
+                try {
+                    Thread.sleep(100);
+                } catch (Exception e) {
+                }
+
+                synchronized (res2) {
+                    System.out.println("Поток 1 навесил замок на Ресурс 2");
+                }
+
+                System.out.println("Поток 1 снял замок с Ресурса 2");
             }
         };
 
@@ -30,18 +39,81 @@ public class App {
             public void run() {
                 synchronized (res2) {
                     System.out.println("Поток 2 навесил замок на Ресурс 2");
+                }
+
+                System.out.println("Поток 2 снял замок с Ресурса 2");
+
+                try {
+                    Thread.sleep(100);
+                } catch (Exception e) {
+                }
+
+                synchronized (res1) {
+                    System.out.println("Поток 2 навесил замок на Ресурс 1");
+                }
+
+                System.out.println("Поток 2 снял замок с Ресурса 1");
+            }
+        };
+
+        P1.start();
+        P2.start();
+
+        try {
+            P1.join();
+            P2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Код с Deadlock
+
+        System.out.println("--- Код с Deadlock ---");
+
+        final String res3 = "my sample text";
+        final String res4 = "some other text";
+
+        // Пусть поток P1 навесит замок на ресурс res1, а затем на res2
+        Thread P3 = new Thread() {
+            public void run() {
+                synchronized (res3) {
+                    System.out.println("Поток 1 навесил замок на Ресурс 1");
                     try {
                         Thread.sleep(100);
                     } catch (Exception e) {
                     }
-                    synchronized (res1) {
+
+                    synchronized (res4) {
+                        System.out.println("Поток 1 навесил замок на Ресурс 2");
+                    }
+                }
+            }
+        };
+
+        // Поток P2 последовательно пытается запереть доступ к res2 и res1
+        Thread P4 = new Thread() {
+            public void run() {
+                synchronized (res4) {
+                    System.out.println("Поток 2 навесил замок на Ресурс 2");
+                    try {
+                        Thread.sleep(100);
+                    } catch (Exception e) {
+                    }
+                    synchronized (res3) {
                         System.out.println("Поток 2 навесил замок на Ресурс 1");
                     }
                 }
             }
         };
 
-        P1.start();
-        P2.start();
+        P3.start();
+        P4.start();
+
+        try {
+            P3.join();
+            P4.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
