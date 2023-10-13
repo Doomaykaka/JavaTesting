@@ -25,14 +25,18 @@ public class App {
         t2.join();
 
         System.out.println("Condition race result: " + ba1);
-        
+
         BankAccount ba2 = new BankAccount(100);
         Thread t3 = new Thread(() -> {
-            depositLoop(ba2);
+            for (int i = 0; i < 1000; i++) {
+                depositSync(ba2);
+            }
         });
 
         Thread t4 = new Thread(() -> {
-            withdrawLoop(ba2);
+            for (int i = 0; i < 1000; i++) {
+                withdrawSync(ba2);
+            }
         });
 
         t3.start();
@@ -40,19 +44,15 @@ public class App {
 
         t3.join();
         t4.join();
-        
+
         System.out.println("Result without condition race: " + ba2);
     }
-    
-    public static synchronized void depositLoop(BankAccount ba) {
-        for (int i = 0; i < 1000; i++) {
-            ba.deposit(100);
-        }
+
+    public static synchronized void depositSync(BankAccount ba) {
+        ba.deposit(100);
     }
-    
-    public static synchronized void withdrawLoop(BankAccount ba) {
-        for (int i = 0; i < 1000; i++) {
-            ba.withdraw(100);
-        }
+
+    public static synchronized void withdrawSync(BankAccount ba) {
+        ba.withdraw(100);
     }
 }
