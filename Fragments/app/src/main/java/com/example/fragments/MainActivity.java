@@ -1,10 +1,9 @@
 package com.example.fragments;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.FragmentManager;
 import android.os.Bundle;
-import android.webkit.WebView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 

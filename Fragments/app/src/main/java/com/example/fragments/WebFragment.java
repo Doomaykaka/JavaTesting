@@ -1,21 +1,16 @@
 package com.example.fragments;
 
 import android.app.Activity;
-import android.content.Context;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import android.app.Fragment;
 
 
 public class WebFragment extends Fragment {
@@ -41,7 +36,6 @@ public class WebFragment extends Fragment {
 
         browser = webView;
 
-
         final Activity activity = getActivity();
 
         webView.setWebViewClient(new WebViewClient() {
@@ -49,10 +43,9 @@ public class WebFragment extends Fragment {
                 Toast.makeText(activity, description, Toast.LENGTH_SHORT).show();
             }
         });
-        //webView.loadUrl("https://www.google.com");
     }
 
-    public static WebView getBrowser(){
+    public static WebView getBrowser() {
         return browser;
     }
 

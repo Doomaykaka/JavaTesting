@@ -1,18 +1,15 @@
 package com.example.fragments;
 
-import android.content.Context;
-import android.net.Uri;
+import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import androidx.annotation.Nullable;
-import android.app.Fragment;
 
 
 public class TitleFragment extends Fragment {
@@ -41,7 +38,7 @@ public class TitleFragment extends Fragment {
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView parent, View view, int position, long id) {
-                if((id >= 0) && (id < TestData.urls.length)){
+                if ((id >= 0) && (id < TestData.urls.length)) {
                     String url = TestData.urls[(int) id];
                     WebFragment.getBrowser().loadUrl(url);
                 }
