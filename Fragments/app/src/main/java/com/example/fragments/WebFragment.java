@@ -20,11 +20,12 @@ import android.app.Fragment;
 
 public class WebFragment extends Fragment {
 
+    private static WebView browser;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -38,6 +39,8 @@ public class WebFragment extends Fragment {
         WebView webView = view.findViewById(R.id.webView);
         webView.getSettings().setJavaScriptEnabled(true);
 
+        browser = webView;
+
 
         final Activity activity = getActivity();
 
@@ -46,7 +49,11 @@ public class WebFragment extends Fragment {
                 Toast.makeText(activity, description, Toast.LENGTH_SHORT).show();
             }
         });
-        webView.loadUrl("https://www.google.com");
+        //webView.loadUrl("https://www.google.com");
+    }
+
+    public static WebView getBrowser(){
+        return browser;
     }
 
 }

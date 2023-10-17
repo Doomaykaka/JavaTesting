@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.FragmentManager;
 import android.os.Bundle;
+import android.webkit.WebView;
 
 public class MainActivity extends AppCompatActivity {
 

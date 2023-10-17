@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -40,7 +41,10 @@ public class TitleFragment extends Fragment {
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView parent, View view, int position, long id) {
-                // WHAT TO DO WHEN CLICK
+                if((id >= 0) && (id < TestData.urls.length)){
+                    String url = TestData.urls[(int) id];
+                    WebFragment.getBrowser().loadUrl(url);
+                }
             }
         });
     }
