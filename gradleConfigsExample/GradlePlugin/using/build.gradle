@@ -10,6 +10,7 @@
 buildscript {
 	repositories {
 		// Search plugin lib directory
+		// Jar name must match the artifact id
 		flatDir { dirs 'libs' }
     }
     
