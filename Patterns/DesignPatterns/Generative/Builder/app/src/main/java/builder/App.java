@@ -8,46 +8,14 @@ public class App {
         CarBuilder builder;
         
         builder = new CarBuilderLigth();
-        builder
-            .setEngine("Engine V3")
-            .setGPS("GPS V1")
-            .setSeats("Light seats")
-            .setTripComputer("Intel")
-            .setAutoType("BMV");
-        
-        Car newCarLigth1 = builder.build();
-        
-        builder.reset();
-        
-        builder
-            .setEngine("Engine V2")
-            .setGPS("GPS V2")
-            .setSeats("Default seats")
-            .setTripComputer("AMD")
-            .setAutoType("Nissan");
-        
-        Car newCarLigth2 = builder.build();
+        Engineer engineer = new Engineer(builder);        
+        Car newCarLigth1 = engineer.buildV3Car();     
+        Car newCarLigth2 = engineer.buildV2Car();  
         
         builder = new CarBuilderTruck();
-        builder
-            .setEngine("Engine V3")
-            .setGPS("GPS V1")
-            .setSeats("Light seats")
-            .setTripComputer("Intel")
-            .setAutoType("BMV");
-        
-        Car newCarTruck1 = builder.build();
-        
-        builder.reset();
-        
-        builder
-            .setEngine("Engine V2")
-            .setGPS("GPS V2")
-            .setSeats("Default seats")
-            .setTripComputer("AMD")
-            .setAutoType("Nissan");
-        
-        Car newCarTruck2 = builder.build();
+        engineer = new Engineer(builder);    
+        Car newCarTruck1 = engineer.buildV3Car();
+        Car newCarTruck2 = engineer.buildV2Car();
         
         System.out.println(newCarLigth1.toString());
         System.out.println(newCarLigth2.toString());
