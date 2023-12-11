@@ -31,3 +31,9 @@ Settings:
 	Package explorer--
 					  |
 					  Context menu (3 dots)--Package presentation = Hierarchical (Eclipse restart needed)
+											 Project presentation = Hierarchical (Eclipse restart needed)
+Import project:
+	After importing the gradle project, you need to update its state.
+	Project context menu--
+						  |
+						  Gradle--Refresh gradle project
