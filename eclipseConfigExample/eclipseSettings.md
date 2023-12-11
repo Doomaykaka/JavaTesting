@@ -1,5 +1,3 @@
-Eclipse:
-	Use eclipse-jee
 Plugins:
 	Buildship Gradle Integration 3.0 https://marketplace.eclipse.org/content/buildship-gradle-integration
 	Eclipse Enterprise Java and Web Developer Tools 3.29 https://marketplace.eclipse.org/content/eclipse-enterprise-java-and-web-developer-tools
@@ -30,3 +28,6 @@ Settings:
 													  Identention--Tab policy = Spaces only
 																   Identention size = 4
 																   Tab size = 4
+	Package explorer--
+					  |
+					  Context menu (3 dots)--Package presentation = Hierarchical (Eclipse restart needed)
