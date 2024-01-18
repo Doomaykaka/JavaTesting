@@ -10,14 +10,18 @@ import java.util.ArrayList;
 import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementNotInteractableException;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 public class App {
     public static void main(String[] args) throws UnsupportedEncodingException {
         // Creating driver
-        WebDriver driver = new ChromeDriver();
+        ChromeOptions capabilities = new ChromeOptions();
+        capabilities.setPageLoadStrategy(PageLoadStrategy.EAGER);
+        WebDriver driver = new ChromeDriver(capabilities);
 
         // Variables
         String pageTitle = null;
