@@ -3,14 +3,32 @@
  */
 package caveatemptorliteh;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Root;
+import javax.persistence.metamodel.ManagedType;
+import javax.persistence.metamodel.Metamodel;
+import javax.persistence.metamodel.SingularAttribute;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 public class App {
     public static void main(String[] args) {
+        
+        // Configuration
+        
         HiberConfiguration.addEntity(User.class);
         HiberConfiguration.addEntity(Bid.class);
         HiberConfiguration.addEntity(Item.class);
@@ -19,10 +37,15 @@ public class App {
         EntityManager manager = null;
 
         manager = HiberConfiguration.getEntityManager();
+        
+        // Manage objects
 
         User user = new User();
         user.setName("Jora Petrovitch");
-
+        
+        User user2 = new User();
+        user2.setName("Vitaliy Metaliy");
+        
         try {
             // Transaction check object changes
             // Persist start checking
@@ -37,6 +60,8 @@ public class App {
             manager.persist(user);
 
             user.setName("Jora Petrovitchnewnew");
+            
+            manager.persist(user2);
 
             transaction.commit();
 
@@ -45,10 +70,17 @@ public class App {
         } catch (EntityExistsException e) {
             System.out.println("Entity is exists");
         }
+        
+        // Manage related objects
 
         Item item = new Item();
         item.setName("Ershik");
-        item.setAuctionEnd(new Date());
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, cal.get(Calendar.YEAR));
+        cal.set(Calendar.MONTH, cal.get(Calendar.MONTH));
+        cal.set(Calendar.DAY_OF_MONTH, cal.get(Calendar.DAY_OF_MONTH) + 1);
+        Date current = cal.getTime();
+        item.setAuctionEnd(current);
 
         Bid billing = new Bid();
         billing.setItem(item);
@@ -71,7 +103,81 @@ public class App {
         } catch (EntityExistsException e) {
             System.out.println("Entity is exists");
         }
-
+        
+        // Using queryies
+        
+        Query findOlderQuery = manager.createNamedQuery("findUser");
+        List<User> users = findOlderQuery.getResultList();
+        
+        System.out.println("Users:");
+        for(User listUser : users) {
+            System.out.println(listUser.getName());
+        }
+        
+        // Validation (custom exec)
+        
+        ValidatorFactory vFactory = Validation.buildDefaultValidatorFactory();
+        Validator validator = vFactory.getValidator();
+        
+        Item testItem = new Item();
+        item.setName("Item");
+        item.setAuctionEnd(new Date());
+        
+        Set<ConstraintViolation<Item>> violations = validator.validate(item);
+        
+        System.out.println("Violations size: " + violations.size());
+        
+        ConstraintViolation<Item> violation = violations.iterator().next();
+        String failedPropertyName = violation.getPropertyPath().iterator().next().getName();
+        
+        System.out.println("Faild property: " + failedPropertyName);
+        
+        // Metamodel (dynamic)
+        
+        Metamodel mm = manager.getMetamodel();
+        Set<ManagedType<?>> managedTypes = mm.getManagedTypes();
+        
+        System.out.println("Items (metamodel):");
+        for(ManagedType itemType : managedTypes) {
+            try {
+                SingularAttribute nameAttribute = itemType.getSingularAttribute("name");
+                System.out.println("Name field type: " + nameAttribute.getJavaType());
+                System.out.println("Name field persistent type: " + nameAttribute.getPersistentAttributeType());
+                System.out.println("Name field is optional: " + nameAttribute.isOptional());
+                
+                SingularAttribute auctionEndAttribute = itemType.getSingularAttribute("auctionEnd");
+                System.out.println("AuctionEnd field type: " + nameAttribute.getJavaType());
+                System.out.println("AuctionEnd field is collection: " + nameAttribute.isCollection());
+                System.out.println("AuctionEnd field is association: " + nameAttribute.isAssociation());
+            } catch (IllegalArgumentException e) {
+                e.getStackTrace();
+            }
+        }
+        
+        // Metamodel (static)
+        
+        CriteriaBuilder cb = manager.getCriteriaBuilder();
+        CriteriaQuery<Item> query = cb.createQuery(Item.class);
+        Root<Item> fromItem = query.from(Item.class);
+        query.select(fromItem);
+        List<Item> items = manager.createQuery(query).getResultList();
+        
+        Path<String> namePath = fromItem.get("name");
+        query.where(
+             cb.like(
+                     namePath,
+                     cb.parameter(String.class, "pattern")
+             )
+        );
+        items = manager.createQuery(query).setParameter("pattern", "Ershik").getResultList();
+        
+        System.out.println("Items (metamodel-static):");
+        for(Item listItem : items) {
+            System.out.println(listItem.getName() + " " + listItem.getAuctionEnd());
+        }
+        
+        // Exit
+        
         manager.close();
     }
 }
