@@ -24,6 +24,11 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import caveatemptorliteh.models.Bid;
+import caveatemptorliteh.models.Item;
+import caveatemptorliteh.models.Item_;
+import caveatemptorliteh.models.User;
+
 public class App {
     public static void main(String[] args) {
         
@@ -174,6 +179,28 @@ public class App {
         System.out.println("Items (metamodel-static):");
         for(Item listItem : items) {
             System.out.println(listItem.getName() + " " + listItem.getAuctionEnd());
+        }
+        
+        // Metamodel (static with metamodel using)
+        
+        CriteriaBuilder cbm = manager.getCriteriaBuilder();
+        CriteriaQuery<Item> querym = cbm.createQuery(Item.class);
+        Root<Item> fromItemM = querym.from(Item.class);
+        querym.select(fromItemM);
+        List<Item> itemsM = manager.createQuery(querym).getResultList();
+        
+        Path<String> namePathM = fromItemM.get(Item_.name);
+        querym.where(
+             cbm.like(
+                     namePathM,
+                     cbm.parameter(String.class, "pattern")
+             )
+        );
+        itemsM = manager.createQuery(querym).setParameter("pattern", "Ershik").getResultList();
+        
+        System.out.println("Items (metamodel-static with metamodel using):");
+        for(Item listItemM : itemsM) {
+            System.out.println(listItemM.getName() + " " + listItemM.getAuctionEnd());
         }
         
         // Exit
