@@ -1,0 +1,51 @@
+
+plugins {
+    // Apply the application plugin to add support for building a CLI application in Java.
+    id 'application'
+}
+
+repositories {
+    // Use Maven Central for resolving dependencies.
+    mavenCentral()
+}
+
+dependencies {
+    // Use JUnit Jupiter for testing.
+    testImplementation libs.junit.jupiter
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // This dependency is used by the application.
+    implementation 'org.hibernate:hibernate-entitymanager:5.0.0.Final'
+    implementation 'org.hibernate:hibernate-core:5.0.0.Final'
+    implementation 'org.hibernate.common:hibernate-commons-annotations:5.0.0.Final'
+    implementation 'org.hibernate:hibernate-validator:5.0.0.Final'
+
+    implementation 'org.xerial:sqlite-jdbc:3.7.2'
+
+    implementation 'javax.persistence:javax.persistence-api:2.2'
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+    implementation 'javax.xml.bind:jaxb-api:2.0'
+    implementation 'org.javassist:javassist:3.25.0-GA'
+}
+
+// Apply a specific Java toolchain to ease working on different environments.
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+run {
+	standardInput = System.in
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'caveatemptor.App'
+}
+
+tasks.named('test') {
+    // Use JUnit Platform for unit tests.
+    useJUnitPlatform()
+}
