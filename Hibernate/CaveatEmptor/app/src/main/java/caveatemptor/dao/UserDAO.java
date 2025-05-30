@@ -24,7 +24,7 @@ public class UserDAO implements GenericDAO<User> {
         this.entityFactory = entityFactory;
     }
 
-    public Set<BillingDetails> getUserBillingDetails(User user) {
+    public List<BillingDetails> getUserBillingDetails(User user) {
         Set<BillingDetails> userBillingDetails = null;
 
         EntityManager entityManager = this.entityFactory.createEntityManager();
@@ -37,7 +37,7 @@ public class UserDAO implements GenericDAO<User> {
         query.where(queryBuilder.equal(fromUsersTable.get(USER_FIELD_ID_NAME), user.getId()));
         userBillingDetails = entityManager.createQuery(query).getSingleResult().getBillingDetails();
 
-        return userBillingDetails;
+        return List.copyOf(userBillingDetails);
     }
 
     public boolean setUserBillingDetails(User user, BillingDetails billingDetails) {

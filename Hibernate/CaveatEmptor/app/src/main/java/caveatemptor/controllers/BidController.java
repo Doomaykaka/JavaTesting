@@ -29,12 +29,14 @@ public class BidController implements GenericController<Bid> {
     private static final String UPDATE_BID_SHOW_OLD_STATE_MESSAGE = "Old Bid = ";
     private static final String UPDATE_BID_GET_ID_MESSAGE = "Input new Bid Id (X if need old) - ";
     private static final String UPDATE_BID_GET_ITEM_ID_MESSAGE = "Input new Bid Item Id (X if need old) - ";
+    private static final String UPDATE_BID_NEW_ITEM_MESSAGE = "New Bid Item:";
     private static final String SAVE_DATA_OLD_STATE_INPUT_VALUE = "X\n";
     private static final String UPDATE_BID_SUCCESS_MESSAGE = "Success";
     private static final String UPDATE_BID_NOT_SUCCESS_MESSAGE = "Not success";
     private static final String CREATE_BID_START_MESSAGE = "Bid update:";
-    private static final String CREATE_BID_GET_ID_MESSAGE = "Input new Bid Id (X if need old) - ";
-    private static final String CREATE_BID_GET_ITEM_ID_MESSAGE = "Input new Bid Item Id (X if need old) - ";
+    private static final String CREATE_BID_GET_ID_MESSAGE = "Input new Bid Id - ";
+    private static final String CREATE_BID_GET_ITEM_ID_MESSAGE = "Input new Bid Item Id - ";
+    private static final String CREATE_BID_NEW_ITEM_MESSAGE = "New Bid Item:";
     private static final String CREATE_BID_SUCCESS_MESSAGE = "Success";
     private static final String CREATE_BID_NOT_SUCCESS_MESSAGE = "Not success";
     private static final String BAD_INPUT_ERROR_MESSAGE = "Bad input!";
@@ -135,52 +137,29 @@ public class BidController implements GenericController<Bid> {
         outputData.add(UPDATE_BID_SHOW_OLD_STATE_MESSAGE + foundBid.toString());
 
         Long newId = -1L;
-        Long newItemId = -1L;
-
-        String newIdInput = ConsoleUtils.readLineWithQuestion(scan, UPDATE_BID_GET_ID_MESSAGE);
 
         try {
-            if (newIdInput.equals(SAVE_DATA_OLD_STATE_INPUT_VALUE)) {
-                newId = foundBid.getId();
-            } else {
-                newId = Long.parseLong(newIdInput);
-            }
+            newId = readId(foundBid);
         } catch (NumberFormatException a) {
             outputData.add(BAD_INPUT_ERROR_MESSAGE);
 
             return outputData;
         }
-
-        String newItemIdInput = ConsoleUtils.readLineWithQuestion(scan, UPDATE_BID_GET_ITEM_ID_MESSAGE);
-
-        Long oldItemId = -1L;
 
         Item bidItem = this.bidDAO.getBidItem(foundBid);
 
-        if (bidItem != null) {
-            oldItemId = bidItem.getId();
-        } else {
-            oldItemId = null;
-        }
-
         try {
-            if (newItemIdInput.equals(SAVE_DATA_OLD_STATE_INPUT_VALUE)) {
-                newItemId = oldItemId;
-            } else {
-                newItemId = Long.parseLong(newItemIdInput);
+            bidItem = readAndSetItem(foundBid, bidItem);
+
+            if (bidItem == null) {
+                outputData.add(BAD_INPUT_ERROR_MESSAGE);
+
+                return outputData;
             }
+
+            outputData.add(UPDATE_BID_NEW_ITEM_MESSAGE);
+            outputData.add(bidItem.toString());
         } catch (NumberFormatException a) {
-            outputData.add(BAD_INPUT_ERROR_MESSAGE);
-
-            return outputData;
-        }
-
-        Item newBidItem = this.itemDAO.get(newItemId);
-
-        if (newBidItem != null) {
-            this.bidDAO.removeBidItem(foundBid, bidItem);
-            this.bidDAO.setBidItem(foundBid, newBidItem);
-        } else {
             outputData.add(BAD_INPUT_ERROR_MESSAGE);
 
             return outputData;
@@ -199,6 +178,39 @@ public class BidController implements GenericController<Bid> {
         return outputData;
     }
 
+    private Long readId(Bid foundBid) throws NumberFormatException {
+        Long newId = -1L;
+
+        String newIdInput = ConsoleUtils.readLineWithQuestion(scan, UPDATE_BID_GET_ID_MESSAGE);
+
+        if (newIdInput.equals(SAVE_DATA_OLD_STATE_INPUT_VALUE)) {
+            newId = foundBid.getId();
+        } else {
+            newId = Long.parseLong(newIdInput);
+        }
+
+        return newId;
+    }
+
+    private Item readAndSetItem(Bid foundBid, Item bidItem) throws NumberFormatException {
+        String newItemIdInput = ConsoleUtils.readLineWithQuestion(scan, UPDATE_BID_GET_ITEM_ID_MESSAGE);
+
+        if (newItemIdInput.equals(SAVE_DATA_OLD_STATE_INPUT_VALUE)) {
+            return bidItem;
+        }
+
+        Long newItemId = Long.parseLong(newItemIdInput);
+
+        Item newBidItem = this.itemDAO.get(newItemId);
+
+        if (newBidItem != null) {
+            this.bidDAO.removeBidItem(foundBid, bidItem);
+            this.bidDAO.setBidItem(foundBid, newBidItem);
+        }
+
+        return newBidItem;
+    }
+
     @Override
     public List<String> create() {
         List<String> outputData = new ArrayList<>();
@@ -208,33 +220,29 @@ public class BidController implements GenericController<Bid> {
         Bid newBid = new Bid();
 
         Long newId = -1L;
-        Long newItemId = -1L;
-
-        String newIdInput = ConsoleUtils.readLineWithQuestion(scan, CREATE_BID_GET_ID_MESSAGE);
 
         try {
-            newId = Long.parseLong(newIdInput);
+            newId = readNewId();
         } catch (NumberFormatException a) {
             outputData.add(BAD_INPUT_ERROR_MESSAGE);
 
             return outputData;
         }
 
-        String newItemIdInput = ConsoleUtils.readLineWithQuestion(scan, CREATE_BID_GET_ITEM_ID_MESSAGE);
+        Item newBidItem = null;
 
         try {
-            newItemId = Long.parseLong(newItemIdInput);
+            newBidItem = readAndSetItem(newBid);
+
+            if (newBidItem == null) {
+                outputData.add(BAD_INPUT_ERROR_MESSAGE);
+
+                return outputData;
+            }
+
+            outputData.add(CREATE_BID_NEW_ITEM_MESSAGE);
+            outputData.add(newBidItem.toString());
         } catch (NumberFormatException a) {
-            outputData.add(BAD_INPUT_ERROR_MESSAGE);
-
-            return outputData;
-        }
-
-        Item newBidItem = this.itemDAO.get(newItemId);
-
-        if (newBidItem != null) {
-            this.bidDAO.setBidItem(newBid, newBidItem);
-        } else {
             outputData.add(BAD_INPUT_ERROR_MESSAGE);
 
             return outputData;
@@ -251,5 +259,29 @@ public class BidController implements GenericController<Bid> {
         }
 
         return outputData;
+    }
+
+    private Long readNewId() throws NumberFormatException {
+        Long newId = -1L;
+
+        String newIdInput = ConsoleUtils.readLineWithQuestion(scan, CREATE_BID_GET_ID_MESSAGE);
+        newId = Long.parseLong(newIdInput);
+
+        return newId;
+    }
+
+    private Item readAndSetItem(Bid newBid) {
+        Long newItemId = -1L;
+
+        String newItemIdInput = ConsoleUtils.readLineWithQuestion(scan, CREATE_BID_GET_ITEM_ID_MESSAGE);
+        newItemId = Long.parseLong(newItemIdInput);
+
+        Item newBidItem = this.itemDAO.get(newItemId);
+
+        if (newBidItem != null) {
+            this.bidDAO.setBidItem(newBid, newBidItem);
+        }
+
+        return newBidItem;
     }
 }
