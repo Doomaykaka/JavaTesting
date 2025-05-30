@@ -48,6 +48,7 @@ public class BillingDetailsController implements GenericController<BillingDetail
     private static final String SAVE_DATA_OLD_STATE_INPUT_VALUE = "X\n";
     private static final String UPDATE_BILLING_DETAILS_SUCCESS_MESSAGE = "Success";
     private static final String UPDATE_BILLING_DETAILS_NOT_SUCCESS_MESSAGE = "Not success";
+    private static final String UPDATE_BILLING_DETAILS_SHOW_NEW_STATE_MESSAGE = "New billing details = ";
     private static final String CREATE_BILLING_DETAILS_START_MESSAGE = "Billing details create:";
     private static final String CREATE_BILLING_DETAILS_GET_ID_MESSAGE = "Input new Billing details Id - ";
     private static final String CREATE_BILLING_DETAILS_GET_OWNER_MESSAGE = "Input new Billing details Owner - ";
@@ -222,6 +223,9 @@ public class BillingDetailsController implements GenericController<BillingDetail
             String swift = ConsoleUtils.readLineWithQuestion(scan,
                     UPDATE_BILLING_DETAILS_BANK_ACCOUNT_GET_SWIFT_MESSAGE);
 
+            bankAccount.setId(newId);
+            bankAccount.setOwner(newOwner);
+
             bankAccount.setAccount(account);
             bankAccount.setBankname(bankname);
             bankAccount.setSwift(swift);
@@ -243,6 +247,9 @@ public class BillingDetailsController implements GenericController<BillingDetail
             String expMonth = ConsoleUtils.readLineWithQuestion(scan, UPDATE_BILLING_DETAILS_CREDIT_CARD_GET_EXP_MONTH);
             String expYear = ConsoleUtils.readLineWithQuestion(scan, UPDATE_BILLING_DETAILS_CREDIT_CARD_GET_EXP_YEAR);
 
+            creditCard.setId(newId);
+            creditCard.setOwner(newOwner);
+
             creditCard.setCardNumber(cardNumber);
             creditCard.setExpMonth(expMonth);
             creditCard.setExpYear(expYear);
@@ -253,6 +260,8 @@ public class BillingDetailsController implements GenericController<BillingDetail
 
             return outputData;
         }
+
+        outputData.add(UPDATE_BILLING_DETAILS_SHOW_NEW_STATE_MESSAGE + foundBillingDetails.toString());
 
         return outputData;
     }
@@ -381,6 +390,8 @@ public class BillingDetailsController implements GenericController<BillingDetail
                 outputData.add(UPDATE_BILLING_DETAILS_NOT_SUCCESS_MESSAGE);
             }
 
+            newBillingDetails = bankAccount;
+
             break;
         case UPDATE_BILLING_DETAILS_TYPE_CREDIT_CARD:
             CreditCard creditCard = new CreditCard();
@@ -400,12 +411,16 @@ public class BillingDetailsController implements GenericController<BillingDetail
             creditCard.setExpMonth(expMonth);
             creditCard.setExpYear(expYear);
 
+            newBillingDetails = creditCard;
+
             break;
         default:
             outputData.add(BAD_INPUT_ERROR_MESSAGE);
 
             return outputData;
         }
+
+        outputData.add(UPDATE_BILLING_DETAILS_SHOW_NEW_STATE_MESSAGE + newBillingDetails.toString());
 
         return outputData;
     }
