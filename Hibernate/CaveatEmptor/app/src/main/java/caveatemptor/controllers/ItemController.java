@@ -44,7 +44,7 @@ public class ItemController implements GenericController<Item> {
     private static final String UPDATE_ITEM_GET_INITIAL_PRICE_MESSAGE = "Input new Initial price (like '12 USD', X if need old) - ";
     private static final String UPDATE_ITEM_GET_IMAGES_MESSAGE = "Input new Images (like 'image-image.png,image2-2/image.png', X if need old) - ";
     private static final String UPDATE_ITEM_GET_BIDS_MESSAGE = "Input new Bids identifiers (like '1,2,43', X if need old) - ";
-    private static final String SAVE_DATA_OLD_STATE_INPUT_VALUE = "X\n";
+    private static final String SAVE_DATA_OLD_STATE_INPUT_VALUE = "X";
     private static final String DATE_POSTFIX = "T00:00:00Z";
     private static final String ELEMENTS_INPUT_SEPARATOR_REGEXP = ",";
     private static final String KEY_VALUE_INPUT_SEPARATOR_REGEXP = "-";

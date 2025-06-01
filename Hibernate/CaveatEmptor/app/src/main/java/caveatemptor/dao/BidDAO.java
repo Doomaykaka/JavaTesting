@@ -26,6 +26,10 @@ public class BidDAO implements GenericDAO<Bid> {
     public Item getBidItem(Bid bid) {
         Item bidItem = null;
 
+        if (bid == null) {
+            return bidItem;
+        }
+
         EntityManager entityManager = this.entityFactory.createEntityManager();
 
         try {
@@ -45,6 +49,10 @@ public class BidDAO implements GenericDAO<Bid> {
 
     public boolean setBidItem(Bid bid, Item item) {
         boolean bidUpdated = false;
+
+        if (bid == null || item == null) {
+            return bidUpdated;
+        }
 
         Bid bidToUpdate = null;
         Item itemToConnect = null;
@@ -73,6 +81,10 @@ public class BidDAO implements GenericDAO<Bid> {
 
     public boolean removeBidItem(Bid bid, Item item) {
         boolean bidUpdated = false;
+
+        if (bid == null || item == null) {
+            return bidUpdated;
+        }
 
         Bid bidToUpdate = null;
         Item itemToDisconnect = null;
@@ -152,6 +164,10 @@ public class BidDAO implements GenericDAO<Bid> {
     public boolean update(Bid entity) {
         boolean bidUpdated = false;
 
+        if (entity == null) {
+            return bidUpdated;
+        }
+
         Bid bidToUpdate = null;
 
         EntityManager entityManager = this.entityFactory.createEntityManager();
@@ -175,12 +191,18 @@ public class BidDAO implements GenericDAO<Bid> {
     public boolean create(Bid entity) {
         boolean bidCreated = false;
 
+        if (entity == null) {
+            return bidCreated;
+        }
+
         Bid bidToCreate = null;
 
         EntityManager entityManager = this.entityFactory.createEntityManager();
         EntityTransaction entityTransaction = entityManager.getTransaction();
 
-        bidToCreate = entityManager.find(Bid.class, entity.getId());
+        Long oldId = entity.getId();
+
+        bidToCreate = entityManager.find(Bid.class, oldId);
         bidCreated = bidToCreate != null;
 
         if (!bidCreated) {
@@ -193,6 +215,10 @@ public class BidDAO implements GenericDAO<Bid> {
             entityTransaction.commit();
 
             bidCreated = entity != null;
+
+            if (bidCreated) {
+                entity.setId(oldId);
+            }
         }
 
         return bidCreated;

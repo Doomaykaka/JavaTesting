@@ -37,10 +37,10 @@ public class UserController implements GenericController<User> {
     private static final String UPDATE_USER_NEED_ADDRESS_TYPE_UPDATE_MESSAGE = "Do I need to change the type and exact information of the address (Yes, No) ?";
     private static final String UPDATE_USER_GET_ADDRESS_STREET_MESSAGE = "Input new Address street (X if need old) - ";
     private static final String UPDATE_USER_GET_ADDRESS_CITY_MESSAGE = "Input new Address city (X if need old) - ";
-    private static final String UPDATE_USER_GET_ZIPCODE_MESSAGE = "Input new Zipcode (like '12 USD', X if need old) - ";
+    private static final String UPDATE_USER_GET_ZIPCODE_MESSAGE = "Input new Zipcode (like '12345', X if need old) - ";
     private static final String UPDATE_USER_GET_BILLING_DETAILS_MESSAGE = "Input new Billing details identifiers (like '1,2,43', X if need old) - ";
-    private static final String YES_INPUT_VALUE = "Yes\n";
-    private static final String NO_INPUT_VALUE = "No\n";
+    private static final String YES_INPUT_VALUE = "Yes";
+    private static final String NO_INPUT_VALUE = "No";
     private static final String CREATE_USER_START_MESSAGE = "User create:";
     private static final String CREATE_USER_GET_ID_MESSAGE = "Input new User Id - ";
     private static final String CREATE_USER_GET_FIRSTNAME_MESSAGE = "Input new User firstname - ";
@@ -48,14 +48,14 @@ public class UserController implements GenericController<User> {
     private static final String CREATE_USER_GET_BILLING_DETAILS_MESSAGE = "Input new Billing details identifiers (like '1,2,43') - ";
     private static final String CREATE_USER_GET_ADDRESS_STREET_MESSAGE = "Input new Address street - ";
     private static final String CREATE_USER_GET_ADDRESS_CITY_MESSAGE = "Input new Address city - ";
-    private static final String CREATE_USER_GET_ZIPCODE_MESSAGE = "Input new Zipcode (like '12 USD') - ";
-    private static final String SAVE_DATA_OLD_STATE_INPUT_VALUE = "X\n";
+    private static final String CREATE_USER_GET_ZIPCODE_MESSAGE = "Input new Zipcode (like '12345') - ";
+    private static final String SAVE_DATA_OLD_STATE_INPUT_VALUE = "X";
     private static final String ELEMENTS_INPUT_SEPARATOR_REGEXP = ",";
     private static final String BAD_INPUT_ERROR_MESSAGE = "Bad input!";
     private static final String OPERATION_USER_SUCCESS_MESSAGE = "Success";
     private static final String OPERATION_USER_NOT_SUCCESS_MESSAGE = "Not success";
     private static final String OPERATION_USER_SHOW_NEW_STATE_MESSAGE = "New user = ";
-    private static final String OPERATION_USER_ADDRESS_TYPE_UPDATE_MESSAGE = "Please enter the address type (German and etc) :";
+    private static final String OPERATION_USER_ADDRESS_TYPE_UPDATE_MESSAGE = "Please enter the address type (German and etc)";
     private static final String OPERATION_USER_ADDRESS_TYPE_GERMAN = "German";
     private static final String OPERATION_USER_NEW_BILLING_DETAILS_MESSAGE = "New User Billing details:";
 

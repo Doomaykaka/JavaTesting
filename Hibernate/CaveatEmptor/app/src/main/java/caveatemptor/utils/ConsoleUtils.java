@@ -19,6 +19,10 @@ public class ConsoleUtils {
             result = scan.nextLine();
         }
 
+        if (result.endsWith("\n")) {
+            result = result.substring(0, result.length() - 3);
+        }
+
         return result;
     }
 

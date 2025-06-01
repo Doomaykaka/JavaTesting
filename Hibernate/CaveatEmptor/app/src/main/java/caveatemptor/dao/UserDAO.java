@@ -27,6 +27,10 @@ public class UserDAO implements GenericDAO<User> {
     public List<BillingDetails> getUserBillingDetails(User user) {
         Set<BillingDetails> userBillingDetails = null;
 
+        if (user == null) {
+            return null;
+        }
+
         EntityManager entityManager = this.entityFactory.createEntityManager();
 
         try {
@@ -46,6 +50,10 @@ public class UserDAO implements GenericDAO<User> {
 
     public boolean setUserBillingDetails(User user, BillingDetails billingDetails) {
         boolean userUpdated = false;
+
+        if (user == null || billingDetails == null) {
+            return userUpdated;
+        }
 
         User userToUpdate = null;
         BillingDetails billingDetailsToConnect = null;
@@ -74,6 +82,10 @@ public class UserDAO implements GenericDAO<User> {
 
     public boolean removeUserBillingDetails(User user, BillingDetails billingDetails) {
         boolean userUpdated = false;
+
+        if (user == null || billingDetails == null) {
+            return userUpdated;
+        }
 
         User userToUpdate = null;
         BillingDetails billingDetailsToDisconnect = null;
@@ -153,6 +165,10 @@ public class UserDAO implements GenericDAO<User> {
     public boolean update(User entity) {
         boolean userUpdated = false;
 
+        if (entity == null) {
+            return userUpdated;
+        }
+
         User userToUpdate = null;
 
         EntityManager entityManager = this.entityFactory.createEntityManager();
@@ -176,10 +192,16 @@ public class UserDAO implements GenericDAO<User> {
     public boolean create(User entity) {
         boolean userCreated = false;
 
+        if (entity == null) {
+            return userCreated;
+        }
+
         User userToCreate = null;
 
         EntityManager entityManager = this.entityFactory.createEntityManager();
         EntityTransaction entityTransaction = entityManager.getTransaction();
+
+        Long oldId = entity.getId();
 
         userToCreate = entityManager.find(User.class, entity.getId());
         userCreated = userToCreate != null;
@@ -194,6 +216,10 @@ public class UserDAO implements GenericDAO<User> {
             entityTransaction.commit();
 
             userCreated = entity != null;
+
+            if (userCreated) {
+                entity.setId(oldId);
+            }
         }
 
         return userCreated;

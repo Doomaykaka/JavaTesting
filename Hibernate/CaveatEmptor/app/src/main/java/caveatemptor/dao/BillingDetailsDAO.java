@@ -26,6 +26,10 @@ public class BillingDetailsDAO implements GenericDAO<BillingDetails> {
     public User getBillingDetailsUser(BillingDetails billingDetails) {
         User billingDetailsUser = null;
 
+        if (billingDetails == null) {
+            return billingDetailsUser;
+        }
+
         EntityManager entityManager = this.entityFactory.createEntityManager();
 
         try {
@@ -45,6 +49,10 @@ public class BillingDetailsDAO implements GenericDAO<BillingDetails> {
 
     public boolean setBillingDetailsUser(BillingDetails billingDetails, User user) {
         boolean billingDetailsUpdated = false;
+
+        if (billingDetails == null || user == null) {
+            return billingDetailsUpdated;
+        }
 
         BillingDetails billingDetailsToUpdate = null;
         User userToConnect = null;
@@ -73,6 +81,10 @@ public class BillingDetailsDAO implements GenericDAO<BillingDetails> {
 
     public boolean removeBillingDetailsUser(BillingDetails billingDetails, User user) {
         boolean billingDetailsUpdated = false;
+
+        if (billingDetails == null || user == null) {
+            return billingDetailsUpdated;
+        }
 
         BillingDetails billingDetailsToUpdate = null;
         User userToDisconnect = null;
@@ -152,6 +164,10 @@ public class BillingDetailsDAO implements GenericDAO<BillingDetails> {
     public boolean update(BillingDetails entity) {
         boolean billingDetailsUpdated = false;
 
+        if (entity == null) {
+            return billingDetailsUpdated;
+        }
+
         BillingDetails billingDetailsToUpdate = null;
 
         EntityManager entityManager = this.entityFactory.createEntityManager();
@@ -175,10 +191,16 @@ public class BillingDetailsDAO implements GenericDAO<BillingDetails> {
     public boolean create(BillingDetails entity) {
         boolean billingDetailsCreated = false;
 
+        if (entity == null) {
+            return billingDetailsCreated;
+        }
+
         BillingDetails billingDetailsToCreate = null;
 
         EntityManager entityManager = this.entityFactory.createEntityManager();
         EntityTransaction entityTransaction = entityManager.getTransaction();
+
+        Long oldId = entity.getId();
 
         billingDetailsToCreate = entityManager.find(BillingDetails.class, entity.getId());
         billingDetailsCreated = billingDetailsToCreate != null;
@@ -193,6 +215,10 @@ public class BillingDetailsDAO implements GenericDAO<BillingDetails> {
             entityTransaction.commit();
 
             billingDetailsCreated = entity != null;
+
+            if (billingDetailsCreated) {
+                entity.setId(oldId);
+            }
         }
 
         return billingDetailsCreated;

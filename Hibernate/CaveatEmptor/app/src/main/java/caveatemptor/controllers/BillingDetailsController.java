@@ -31,9 +31,9 @@ public class BillingDetailsController implements GenericController<BillingDetail
     private static final String UPDATE_BILLING_DETAILS_GET_OWNER_MESSAGE = "Input new Billing details Owner (X if need old) - ";
     private static final String UPDATE_BILLING_DETAILS_GET_USER_ID_MESSAGE = "Input new Billing details User Id (X if need old) - ";
     private static final String UPDATE_BILLING_DETAILS_NEED_TYPE_UPDATE_MESSAGE = "Do I need to change the type and exact information of the payment method (Yes, No) ?";
-    private static final String YES_INPUT_VALUE = "Yes\n";
-    private static final String NO_INPUT_VALUE = "No\n";
-    private static final String SAVE_DATA_OLD_STATE_INPUT_VALUE = "X\n";
+    private static final String YES_INPUT_VALUE = "Yes";
+    private static final String NO_INPUT_VALUE = "No";
+    private static final String SAVE_DATA_OLD_STATE_INPUT_VALUE = "X";
     private static final String CREATE_BILLING_DETAILS_START_MESSAGE = "Billing details create:";
     private static final String CREATE_BILLING_DETAILS_GET_ID_MESSAGE = "Input new Billing details Id - ";
     private static final String CREATE_BILLING_DETAILS_GET_OWNER_MESSAGE = "Input new Billing details Owner - ";
@@ -43,12 +43,12 @@ public class BillingDetailsController implements GenericController<BillingDetail
     private static final String OPERATION_BILLING_DETAILS_SUCCESS_MESSAGE = "Success";
     private static final String OPERATION_BILLING_DETAILS_NOT_SUCCESS_MESSAGE = "Not success";
     private static final String OPERATION_BILLING_DETAILS_SHOW_NEW_STATE_MESSAGE = "New billing details = ";
-    private static final String OPERATION_BILLING_DETAILS_TYPE_UPDATE_MESSAGE = "Please enter the payment method type (Bank account, Credit card and etc) :";
-    private static final String OPERATION_BILLING_DETAILS_TYPE_BANK_ACCOUNT = "Bank account\n";
+    private static final String OPERATION_BILLING_DETAILS_TYPE_UPDATE_MESSAGE = "Please enter the payment method type (Bank account, Credit card and etc) ";
+    private static final String OPERATION_BILLING_DETAILS_TYPE_BANK_ACCOUNT = "Bank account";
     private static final String OPERATION_BILLING_DETAILS_BANK_ACCOUNT_GET_ACCOUNT_MESSAGE = "Input new Bank account name - ";
     private static final String OPERATION_BILLING_DETAILS_BANK_ACCOUNT_GET_BANKNAME_MESSAGE = "Input new Bank account bankname - ";
     private static final String OPERATION_BILLING_DETAILS_BANK_ACCOUNT_GET_SWIFT_MESSAGE = "Input new Bank account swift - ";
-    private static final String OPERATION_BILLING_DETAILS_TYPE_CREDIT_CARD = "Credit card\n";
+    private static final String OPERATION_BILLING_DETAILS_TYPE_CREDIT_CARD = "Credit card";
     private static final String OPERATION_BILLING_DETAILS_CREDIT_CARD_GET_CARD_NUMBER = "Input new Credit card number - ";
     private static final String OPERATION_BILLING_DETAILS_CREDIT_CARD_GET_EXP_MONTH = "Input new Credit card exp month - ";
     private static final String OPERATION_BILLING_DETAILS_CREDIT_CARD_GET_EXP_YEAR = "Input new Credit card exp year - ";

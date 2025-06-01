@@ -26,6 +26,10 @@ public class ItemDAO implements GenericDAO<Item> {
     public List<Bid> getItemBids(Item item) {
         List<Bid> itemBids = null;
 
+        if (item == null) {
+            return itemBids;
+        }
+
         EntityManager entityManager = this.entityFactory.createEntityManager();
 
         try {
@@ -45,6 +49,10 @@ public class ItemDAO implements GenericDAO<Item> {
 
     public boolean setItemBid(Item item, Bid bid) {
         boolean itemUpdated = false;
+
+        if (item == null || bid == null) {
+            return itemUpdated;
+        }
 
         Item itemToUpdate = null;
         Bid bidToConnect = null;
@@ -73,6 +81,10 @@ public class ItemDAO implements GenericDAO<Item> {
 
     public boolean removeItemBid(Item item, Bid bid) {
         boolean itemUpdated = false;
+
+        if (item == null || bid == null) {
+            return itemUpdated;
+        }
 
         Item itemToUpdate = null;
         Bid bidToDisconnect = null;
@@ -152,6 +164,10 @@ public class ItemDAO implements GenericDAO<Item> {
     public boolean update(Item entity) {
         boolean itemUpdated = false;
 
+        if (entity == null) {
+            return itemUpdated;
+        }
+
         Item itemToUpdate = null;
 
         EntityManager entityManager = this.entityFactory.createEntityManager();
@@ -175,10 +191,16 @@ public class ItemDAO implements GenericDAO<Item> {
     public boolean create(Item entity) {
         boolean itemCreated = false;
 
+        if (entity == null) {
+            return itemCreated;
+        }
+
         Item itemToCreate = null;
 
         EntityManager entityManager = this.entityFactory.createEntityManager();
         EntityTransaction entityTransaction = entityManager.getTransaction();
+
+        Long oldId = entity.getId();
 
         itemToCreate = entityManager.find(Item.class, entity.getId());
         itemCreated = itemToCreate != null;
@@ -193,6 +215,10 @@ public class ItemDAO implements GenericDAO<Item> {
             entityTransaction.commit();
 
             itemCreated = entity != null;
+
+            if (itemCreated) {
+                entity.setId(oldId);
+            }
         }
 
         return itemCreated;

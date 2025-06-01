@@ -27,7 +27,7 @@ public class BidController implements GenericController<Bid> {
     private static final String UPDATE_BID_SHOW_OLD_STATE_MESSAGE = "Old Bid = ";
     private static final String UPDATE_BID_GET_ID_MESSAGE = "Input new Bid Id (X if need old) - ";
     private static final String UPDATE_BID_GET_ITEM_ID_MESSAGE = "Input new Bid Item Id (X if need old) - ";
-    private static final String SAVE_DATA_OLD_STATE_INPUT_VALUE = "X\n";
+    private static final String SAVE_DATA_OLD_STATE_INPUT_VALUE = "X";
     private static final String CREATE_BID_START_MESSAGE = "Bid create:";
     private static final String CREATE_BID_GET_ID_MESSAGE = "Input new Bid Id - ";
     private static final String CREATE_BID_GET_ITEM_ID_MESSAGE = "Input new Bid Item Id - ";
