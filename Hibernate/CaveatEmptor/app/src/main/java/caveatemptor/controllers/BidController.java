@@ -206,7 +206,7 @@ public class BidController implements GenericController<Bid> {
         return newBidItem;
     }
 
-    @Override
+    //@Override
     public List<String> create() {
         List<String> outputData = new ArrayList<>();
 
@@ -258,10 +258,6 @@ public class BidController implements GenericController<Bid> {
         newItemId = Long.parseLong(newItemIdInput);
 
         Item newBidItem = this.itemDAO.get(newItemId);
-
-        if (newBidItem != null) {
-            this.bidDAO.setBidItem(newBid, newBidItem);
-        }
 
         return newBidItem;
     }

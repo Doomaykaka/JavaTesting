@@ -13,7 +13,7 @@ import javax.persistence.criteria.Root;
 import caveatemptor.models.Bid;
 import caveatemptor.models.Item;
 
-public class BidDAO implements GenericDAO<Bid> {
+public class BidDAO {
     private EntityManagerFactory entityFactory;
 
     private static final String BID_FIELD_ITEM_NAME = "item";
@@ -111,7 +111,7 @@ public class BidDAO implements GenericDAO<Bid> {
         return bidUpdated;
     }
 
-    @Override
+
     public Bid get(long id) {
         Bid foundBid = null;
 
@@ -122,7 +122,7 @@ public class BidDAO implements GenericDAO<Bid> {
         return foundBid;
     }
 
-    @Override
+
     public List<Bid> getAll() {
         List<Bid> bids = null;
 
@@ -137,7 +137,7 @@ public class BidDAO implements GenericDAO<Bid> {
         return bids;
     }
 
-    @Override
+
     public boolean remove(long id) {
         boolean bidRemoved = false;
 
@@ -160,7 +160,7 @@ public class BidDAO implements GenericDAO<Bid> {
         return bidRemoved;
     }
 
-    @Override
+
     public boolean update(Bid entity) {
         boolean bidUpdated = false;
 
@@ -187,7 +187,7 @@ public class BidDAO implements GenericDAO<Bid> {
         return bidUpdated;
     }
 
-    @Override
+
     public Bid create(Item item) {
         EntityManager entityManager = this.entityFactory.createEntityManager();
         EntityTransaction entityTransaction = entityManager.getTransaction();
@@ -195,7 +195,7 @@ public class BidDAO implements GenericDAO<Bid> {
         entityTransaction.begin();
 
         Bid newBid = new Bid();
-        newBit.setItem(item);
+        newBid.setItem(item);
 
         entityManager.persist(newBid);
         entityTransaction.commit();
