@@ -38,19 +38,20 @@ public class ItemController implements GenericController<Item> {
     private static final String UPDATE_ITEM_SHOW_OLD_STATE_MESSAGE = "Old Item = ";
     private static final String UPDATE_ITEM_GET_ID_MESSAGE = "Input new Item Id (X if need old) - ";
     private static final String UPDATE_ITEM_GET_NAME_MESSAGE = "Input new Item name (X if need old) - ";
-    private static final String UPDATE_ITEM_GET_AUCTION_END_MESSAGE = "Input new Auction end date (like '01.01.1999', X if need old) - ";
+    private static final String UPDATE_ITEM_GET_AUCTION_END_MESSAGE = "Input new Auction end date (like '1999-01-01', X if need old) - ";
     private static final String UPDATE_ITEM_GET_AUCTION_TYPE_MESSAGE = "Input new Auction type (like 'HIGHEST_BID', 'LOWEST_BID' or 'FIXED_PRICE', X if need old) - ";
     private static final String UPDATE_ITEM_GET_BUY_NOW_PRICE_MESSAGE = "Input new Buy now price (like '12 USD', X if need old) - ";
     private static final String UPDATE_ITEM_GET_INITIAL_PRICE_MESSAGE = "Input new Initial price (like '12 USD', X if need old) - ";
     private static final String UPDATE_ITEM_GET_IMAGES_MESSAGE = "Input new Images (like 'image-image.png,image2-2/image.png', X if need old) - ";
     private static final String UPDATE_ITEM_GET_BIDS_MESSAGE = "Input new Bids identifiers (like '1,2,43', X if need old) - ";
     private static final String SAVE_DATA_OLD_STATE_INPUT_VALUE = "X\n";
+    private static final String DATE_POSTFIX = "T00:00:00Z";
     private static final String ELEMENTS_INPUT_SEPARATOR_REGEXP = ",";
     private static final String KEY_VALUE_INPUT_SEPARATOR_REGEXP = "-";
     private static final String CREATE_ITEM_START_MESSAGE = "Item create:";
     private static final String CREATE_ITEM_GET_ID_MESSAGE = "Input new Item Id - ";
     private static final String CREATE_ITEM_GET_NAME_MESSAGE = "Input new Item name - ";
-    private static final String CREATE_ITEM_GET_AUCTION_END_MESSAGE = "Input new Auction end date (like '01.01.1999') - ";
+    private static final String CREATE_ITEM_GET_AUCTION_END_MESSAGE = "Input new Auction end date (like '1999-01-01') - ";
     private static final String CREATE_ITEM_GET_AUCTION_TYPE_MESSAGE = "Input new Auction type (like 'HIGHEST_BID', 'LOWEST_BID' or 'FIXED_PRICE') - ";
     private static final String CREATE_ITEM_GET_BUY_NOW_PRICE_MESSAGE = "Input new Buy now price (like '12 USD') - ";
     private static final String CREATE_ITEM_GET_INITIAL_PRICE_MESSAGE = "Input new Initial price (like '12 USD') - ";
@@ -288,6 +289,7 @@ public class ItemController implements GenericController<Item> {
         Date newDate = null;
 
         String newDateInput = ConsoleUtils.readLineWithQuestion(scan, UPDATE_ITEM_GET_AUCTION_END_MESSAGE);
+        newDateInput += "T00:00:00Z";
 
         if (newDateInput.equals(SAVE_DATA_OLD_STATE_INPUT_VALUE)) {
             newDate = foundItem.getAuctionEnd();
@@ -376,6 +378,10 @@ public class ItemController implements GenericController<Item> {
         String[] bidsIdentifiers = newBidsIdentifiersInput.split(ELEMENTS_INPUT_SEPARATOR_REGEXP);
 
         for (String bidIdentifier : bidsIdentifiers) {
+            if (bidIdentifier.isEmpty()) {
+                break;
+            }
+
             Long bidId = Long.parseLong(bidIdentifier);
 
             Bid foundBid = this.bidDAO.get(bidId);
@@ -521,6 +527,8 @@ public class ItemController implements GenericController<Item> {
         Date newDate = null;
 
         String newDateInput = ConsoleUtils.readLineWithQuestion(scan, CREATE_ITEM_GET_AUCTION_END_MESSAGE);
+        newDateInput += DATE_POSTFIX;
+
         newDate = Date.from(Instant.parse(newDateInput));
 
         return newDate;
@@ -580,6 +588,10 @@ public class ItemController implements GenericController<Item> {
         String[] bidsIdentifiers = newBidsIdentifiersInput.split(ELEMENTS_INPUT_SEPARATOR_REGEXP);
 
         for (String bidIdentifier : bidsIdentifiers) {
+            if (bidIdentifier.isEmpty()) {
+                break;
+            }
+
             Long bidId = Long.parseLong(bidIdentifier);
 
             Bid foundBid = this.bidDAO.get(bidId);

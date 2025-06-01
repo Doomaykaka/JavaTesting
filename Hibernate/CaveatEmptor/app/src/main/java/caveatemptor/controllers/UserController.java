@@ -338,6 +338,10 @@ public class UserController implements GenericController<User> {
         String[] billingDetailsIdentifiers = newBillingDetailsIdentifiersInput.split(ELEMENTS_INPUT_SEPARATOR_REGEXP);
 
         for (String billingDetailsIdentifier : billingDetailsIdentifiers) {
+            if (billingDetailsIdentifier.isEmpty()) {
+                break;
+            }
+
             Long billingDetailsId = Long.parseLong(billingDetailsIdentifier);
 
             BillingDetails foundBillingDetails = this.billingDetailsDAO.get(billingDetailsId);
@@ -496,6 +500,10 @@ public class UserController implements GenericController<User> {
         String[] billingDetailsIdentifiers = newBillingDetailsIdentifiersInput.split(ELEMENTS_INPUT_SEPARATOR_REGEXP);
 
         for (String billingDetailsIdentifier : billingDetailsIdentifiers) {
+            if (billingDetailsIdentifier.isEmpty()) {
+                break;
+            }
+
             Long billingDetailsId = Long.parseLong(billingDetailsIdentifier);
 
             BillingDetails foundBillingDetails = this.billingDetailsDAO.get(billingDetailsId);

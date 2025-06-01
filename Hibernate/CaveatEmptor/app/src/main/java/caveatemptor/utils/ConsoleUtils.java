@@ -1,5 +1,6 @@
 package caveatemptor.utils;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleUtils {
@@ -19,5 +20,15 @@ public class ConsoleUtils {
         }
 
         return result;
+    }
+
+    public static void printText(List<String> text) {
+        for (String line : text) {
+            System.out.println(line);
+        }
+    }
+
+    public static void printText(String text) {
+        System.out.println(text);
     }
 }

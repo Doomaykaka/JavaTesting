@@ -59,7 +59,7 @@ public class BillingDetailsController implements GenericController<BillingDetail
         this.scan = scan;
     }
 
-    public List<String> getBillingDetailsItem(long id) {
+    public List<String> getBillingDetailsUser(long id) {
         List<String> outputData = new ArrayList<>();
 
         BillingDetails foundBillingDetails = this.billingDetailsDAO.get(id);
