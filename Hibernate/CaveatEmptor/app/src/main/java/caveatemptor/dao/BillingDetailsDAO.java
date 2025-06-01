@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -27,13 +28,17 @@ public class BillingDetailsDAO implements GenericDAO<BillingDetails> {
 
         EntityManager entityManager = this.entityFactory.createEntityManager();
 
-        CriteriaBuilder queryBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<BillingDetails> query = queryBuilder.createQuery(BillingDetails.class);
-        Root<BillingDetails> fromBillingDetailsTable = query.from(BillingDetails.class);
-        fromBillingDetailsTable.fetch(BILLING_DETAILS_FIELD_USER_NAME);
-        query.select(fromBillingDetailsTable);
-        query.where(queryBuilder.equal(fromBillingDetailsTable.get(BILLING_DETAILS_FIELD), billingDetails.getId()));
-        billingDetailsUser = entityManager.createQuery(query).getSingleResult().getUser();
+        try {
+            CriteriaBuilder queryBuilder = entityManager.getCriteriaBuilder();
+            CriteriaQuery<BillingDetails> query = queryBuilder.createQuery(BillingDetails.class);
+            Root<BillingDetails> fromBillingDetailsTable = query.from(BillingDetails.class);
+            fromBillingDetailsTable.fetch(BILLING_DETAILS_FIELD_USER_NAME);
+            query.select(fromBillingDetailsTable);
+            query.where(queryBuilder.equal(fromBillingDetailsTable.get(BILLING_DETAILS_FIELD), billingDetails.getId()));
+            billingDetailsUser = entityManager.createQuery(query).getSingleResult().getUser();
+        } catch (NoResultException a) {
+            billingDetailsUser = null;
+        }
 
         return billingDetailsUser;
     }

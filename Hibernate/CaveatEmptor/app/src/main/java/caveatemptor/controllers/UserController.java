@@ -402,27 +402,6 @@ public class UserController implements GenericController<User> {
             return outputData;
         }
 
-        try {
-            newBillingDetails = readAndSetBillingDetails(newUser);
-        } catch (NumberFormatException a) {
-            outputData.add(BAD_INPUT_ERROR_MESSAGE);
-
-            return outputData;
-        } catch (PatternSyntaxException b) {
-            outputData.add(BAD_INPUT_ERROR_MESSAGE);
-
-            return outputData;
-        }
-
-        if (newBillingDetails == null) {
-            outputData.add(BAD_INPUT_ERROR_MESSAGE);
-
-            return outputData;
-        }
-
-        outputData.add(OPERATION_USER_NEW_BILLING_DETAILS_MESSAGE);
-        outputData.add(newBillingDetails.toString());
-
         String addressTypeInput = ConsoleUtils.readLineWithQuestion(scan, OPERATION_USER_ADDRESS_TYPE_UPDATE_MESSAGE);
 
         switch (addressTypeInput) {
@@ -444,6 +423,27 @@ public class UserController implements GenericController<User> {
             newUser.setAddress(newAddress);
 
             boolean userCreated = this.userDAO.create(newUser);
+
+            try {
+                newBillingDetails = readAndSetBillingDetails(newUser);
+            } catch (NumberFormatException a) {
+                outputData.add(BAD_INPUT_ERROR_MESSAGE);
+
+                return outputData;
+            } catch (PatternSyntaxException b) {
+                outputData.add(BAD_INPUT_ERROR_MESSAGE);
+
+                return outputData;
+            }
+
+            if (newBillingDetails == null) {
+                outputData.add(BAD_INPUT_ERROR_MESSAGE);
+
+                return outputData;
+            }
+
+            outputData.add(OPERATION_USER_NEW_BILLING_DETAILS_MESSAGE);
+            outputData.add(newBillingDetails.toString());
 
             if (userCreated) {
                 outputData.add(OPERATION_USER_SUCCESS_MESSAGE);

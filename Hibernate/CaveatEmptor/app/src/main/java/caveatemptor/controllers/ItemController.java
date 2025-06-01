@@ -463,6 +463,16 @@ public class ItemController implements GenericController<Item> {
             return outputData;
         }
 
+        newItem.setId(newId);
+        newItem.setName(newName);
+        newItem.setAuctionEnd(newAuctionEnd);
+        newItem.setAuctionType(newAuctionType);
+        newItem.setBuyNowPrice(newBuyNowPrice);
+        newItem.setInitialPrice(newInitialPrice);
+        newItem.setImages(newImages);
+
+        boolean itemCreated = this.itemDAO.create(newItem);
+
         List<Bid> newBids = null;
 
         try {
@@ -485,16 +495,6 @@ public class ItemController implements GenericController<Item> {
 
         outputData.add(OPERATION_ITEM_NEW_BIDS_MESSAGE);
         outputData.add(newBids.toString());
-
-        newItem.setId(newId);
-        newItem.setName(newName);
-        newItem.setAuctionEnd(newAuctionEnd);
-        newItem.setAuctionType(newAuctionType);
-        newItem.setBuyNowPrice(newBuyNowPrice);
-        newItem.setInitialPrice(newInitialPrice);
-        newItem.setImages(newImages);
-
-        boolean itemCreated = this.itemDAO.create(newItem);
 
         if (itemCreated) {
             outputData.add(OPERATION_ITEM_SUCCESS_MESSAGE);

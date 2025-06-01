@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.NoResultException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
@@ -27,13 +28,17 @@ public class BidDAO implements GenericDAO<Bid> {
 
         EntityManager entityManager = this.entityFactory.createEntityManager();
 
-        CriteriaBuilder queryBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Bid> query = queryBuilder.createQuery(Bid.class);
-        Root<Bid> fromBidsTable = query.from(Bid.class);
-        fromBidsTable.fetch(BID_FIELD_ITEM_NAME);
-        query.select(fromBidsTable);
-        query.where(queryBuilder.equal(fromBidsTable.get(BID_FIELD_ID_NAME), bid.getId()));
-        bidItem = entityManager.createQuery(query).getSingleResult().getItem();
+        try {
+            CriteriaBuilder queryBuilder = entityManager.getCriteriaBuilder();
+            CriteriaQuery<Bid> query = queryBuilder.createQuery(Bid.class);
+            Root<Bid> fromBidsTable = query.from(Bid.class);
+            fromBidsTable.fetch(BID_FIELD_ITEM_NAME);
+            query.select(fromBidsTable);
+            query.where(queryBuilder.equal(fromBidsTable.get(BID_FIELD_ID_NAME), bid.getId()));
+            bidItem = entityManager.createQuery(query).getSingleResult().getItem();
+        } catch (NoResultException a) {
+            bidItem = null;
+        }
 
         return bidItem;
     }

@@ -224,6 +224,10 @@ public class BidController implements GenericController<Bid> {
             return outputData;
         }
 
+        newBid.setId(newId);
+
+        boolean bidCreated = this.bidDAO.create(newBid);
+
         Item newBidItem = null;
 
         try {
@@ -243,9 +247,7 @@ public class BidController implements GenericController<Bid> {
             return outputData;
         }
 
-        newBid.setId(newId);
-
-        boolean bidCreated = this.bidDAO.create(newBid);
+        this.bidDAO.update(newBid);
 
         if (bidCreated) {
             outputData.add(OPERATION_SUCCESS_MESSAGE);

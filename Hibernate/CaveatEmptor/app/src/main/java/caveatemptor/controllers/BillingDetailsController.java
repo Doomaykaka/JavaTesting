@@ -374,17 +374,16 @@ public class BillingDetailsController implements GenericController<BillingDetail
 
             bankAccount.setId(newId);
             bankAccount.setOwner(newOwner);
-
-            this.billingDetailsDAO.removeBillingDetailsUser(bankAccount, newUser);
-            this.billingDetailsDAO.setBillingDetailsUser(bankAccount, newUser);
-
             bankAccount.setAccount(account);
             bankAccount.setBankname(bankname);
             bankAccount.setSwift(swift);
 
-            boolean billingDetailsUpdated = this.billingDetailsDAO.update(bankAccount);
+            boolean bankAccountCreated = this.billingDetailsDAO.create(bankAccount);
 
-            if (billingDetailsUpdated) {
+            this.billingDetailsDAO.removeBillingDetailsUser(bankAccount, newUser);
+            this.billingDetailsDAO.setBillingDetailsUser(bankAccount, newUser);
+
+            if (bankAccountCreated) {
                 outputData.add(OPERATION_BILLING_DETAILS_SUCCESS_MESSAGE);
             } else {
                 outputData.add(OPERATION_BILLING_DETAILS_NOT_SUCCESS_MESSAGE);
@@ -405,13 +404,20 @@ public class BillingDetailsController implements GenericController<BillingDetail
 
             creditCard.setId(newId);
             creditCard.setOwner(newOwner);
+            creditCard.setCardNumber(cardNumber);
+            creditCard.setExpMonth(expMonth);
+            creditCard.setExpYear(expYear);
+
+            boolean creditCardCreated = this.billingDetailsDAO.create(creditCard);
 
             this.billingDetailsDAO.removeBillingDetailsUser(creditCard, newUser);
             this.billingDetailsDAO.setBillingDetailsUser(creditCard, newUser);
 
-            creditCard.setCardNumber(cardNumber);
-            creditCard.setExpMonth(expMonth);
-            creditCard.setExpYear(expYear);
+            if (creditCardCreated) {
+                outputData.add(OPERATION_BILLING_DETAILS_SUCCESS_MESSAGE);
+            } else {
+                outputData.add(OPERATION_BILLING_DETAILS_NOT_SUCCESS_MESSAGE);
+            }
 
             newBillingDetails = creditCard;
 
