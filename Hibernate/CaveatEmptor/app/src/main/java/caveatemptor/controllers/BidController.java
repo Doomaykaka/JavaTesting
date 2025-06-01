@@ -212,26 +212,10 @@ public class BidController implements GenericController<Bid> {
 
         outputData.add(CREATE_BID_START_MESSAGE);
 
-        Bid newBid = new Bid();
-
-        Long newId = -1L;
-
-        try {
-            newId = readNewId();
-        } catch (NumberFormatException a) {
-            outputData.add(BAD_INPUT_ERROR_MESSAGE);
-
-            return outputData;
-        }
-
-        newBid.setId(newId);
-
-        boolean bidCreated = this.bidDAO.create(newBid);
-
         Item newBidItem = null;
 
         try {
-            newBidItem = readAndSetItem(newBid);
+            newBidItem = readAndSetItem();
 
             if (newBidItem == null) {
                 outputData.add(BAD_INPUT_ERROR_MESSAGE);
@@ -247,9 +231,9 @@ public class BidController implements GenericController<Bid> {
             return outputData;
         }
 
-        this.bidDAO.update(newBid);
+        Bid bid = this.bidDAO.create(newBidItem);
 
-        if (bidCreated) {
+        if (bid != null) {
             outputData.add(OPERATION_SUCCESS_MESSAGE);
         } else {
             outputData.add(OPERATION_NOT_SUCCESS_MESSAGE);
@@ -267,7 +251,7 @@ public class BidController implements GenericController<Bid> {
         return newId;
     }
 
-    private Item readAndSetItem(Bid newBid) {
+    private Item readAndSetItem() {
         Long newItemId = -1L;
 
         String newItemIdInput = ConsoleUtils.readLineWithQuestion(scan, CREATE_BID_GET_ITEM_ID_MESSAGE);

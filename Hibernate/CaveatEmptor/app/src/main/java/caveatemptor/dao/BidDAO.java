@@ -188,39 +188,18 @@ public class BidDAO implements GenericDAO<Bid> {
     }
 
     @Override
-    public boolean create(Bid entity) {
-        boolean bidCreated = false;
-
-        if (entity == null) {
-            return bidCreated;
-        }
-
-        Bid bidToCreate = null;
-
+    public Bid create(Item item) {
         EntityManager entityManager = this.entityFactory.createEntityManager();
         EntityTransaction entityTransaction = entityManager.getTransaction();
 
-        Long oldId = entity.getId();
+        entityTransaction.begin();
 
-        bidToCreate = entityManager.find(Bid.class, oldId);
-        bidCreated = bidToCreate != null;
+        Bid newBid = new Bid();
+        newBit.setItem(item);
 
-        if (!bidCreated) {
-            entityTransaction.begin();
+        entityManager.persist(newBid);
+        entityTransaction.commit();
 
-            entity.setId(null);
-
-            entityManager.persist(entity);
-
-            entityTransaction.commit();
-
-            bidCreated = entity != null;
-
-            if (bidCreated) {
-                entity.setId(oldId);
-            }
-        }
-
-        return bidCreated;
+        return newBid;
     }
 }
