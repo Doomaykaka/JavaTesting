@@ -23,23 +23,18 @@ public class BidController implements GenericController<Bid> {
     private static final String GET_BID_START_MESSAGE_SECOND_PART = ":";
     private static final String GET_BIDS_START_MESSAGE = "Bids:";
     private static final String REMOVE_BID_START_MESSAGE = "Bid remove:";
-    private static final String REMOVE_BID_SUCCESS_MESSAGE = "Success";
-    private static final String REMOVE_BID_NOT_SUCCESS_MESSAGE = "Not success";
     private static final String UPDATE_BID_START_MESSAGE = "Bid update:";
     private static final String UPDATE_BID_SHOW_OLD_STATE_MESSAGE = "Old Bid = ";
     private static final String UPDATE_BID_GET_ID_MESSAGE = "Input new Bid Id (X if need old) - ";
     private static final String UPDATE_BID_GET_ITEM_ID_MESSAGE = "Input new Bid Item Id (X if need old) - ";
-    private static final String UPDATE_BID_NEW_ITEM_MESSAGE = "New Bid Item:";
     private static final String SAVE_DATA_OLD_STATE_INPUT_VALUE = "X\n";
-    private static final String UPDATE_BID_SUCCESS_MESSAGE = "Success";
-    private static final String UPDATE_BID_NOT_SUCCESS_MESSAGE = "Not success";
-    private static final String CREATE_BID_START_MESSAGE = "Bid update:";
+    private static final String CREATE_BID_START_MESSAGE = "Bid create:";
     private static final String CREATE_BID_GET_ID_MESSAGE = "Input new Bid Id - ";
     private static final String CREATE_BID_GET_ITEM_ID_MESSAGE = "Input new Bid Item Id - ";
-    private static final String CREATE_BID_NEW_ITEM_MESSAGE = "New Bid Item:";
-    private static final String CREATE_BID_SUCCESS_MESSAGE = "Success";
-    private static final String CREATE_BID_NOT_SUCCESS_MESSAGE = "Not success";
     private static final String BAD_INPUT_ERROR_MESSAGE = "Bad input!";
+    private static final String OPERATION_SUCCESS_MESSAGE = "Success";
+    private static final String OPERATION_NOT_SUCCESS_MESSAGE = "Not success";
+    private static final String OPERATION_BID_NEW_ITEM_MESSAGE = "New Bid Item:";
 
     public BidController(EntityManagerFactory entityFactory, Scanner scan) {
         this.bidDAO = new BidDAO(entityFactory);
@@ -112,9 +107,9 @@ public class BidController implements GenericController<Bid> {
         outputData.add(REMOVE_BID_START_MESSAGE);
 
         if (this.bidDAO.remove(id)) {
-            outputData.add(REMOVE_BID_SUCCESS_MESSAGE);
+            outputData.add(OPERATION_SUCCESS_MESSAGE);
         } else {
-            outputData.add(REMOVE_BID_NOT_SUCCESS_MESSAGE);
+            outputData.add(OPERATION_NOT_SUCCESS_MESSAGE);
         }
 
         return outputData;
@@ -157,7 +152,7 @@ public class BidController implements GenericController<Bid> {
                 return outputData;
             }
 
-            outputData.add(UPDATE_BID_NEW_ITEM_MESSAGE);
+            outputData.add(OPERATION_BID_NEW_ITEM_MESSAGE);
             outputData.add(bidItem.toString());
         } catch (NumberFormatException a) {
             outputData.add(BAD_INPUT_ERROR_MESSAGE);
@@ -170,9 +165,9 @@ public class BidController implements GenericController<Bid> {
         boolean bidUpdated = this.bidDAO.update(foundBid);
 
         if (bidUpdated) {
-            outputData.add(UPDATE_BID_SUCCESS_MESSAGE);
+            outputData.add(OPERATION_SUCCESS_MESSAGE);
         } else {
-            outputData.add(UPDATE_BID_NOT_SUCCESS_MESSAGE);
+            outputData.add(OPERATION_NOT_SUCCESS_MESSAGE);
         }
 
         return outputData;
@@ -240,7 +235,7 @@ public class BidController implements GenericController<Bid> {
                 return outputData;
             }
 
-            outputData.add(CREATE_BID_NEW_ITEM_MESSAGE);
+            outputData.add(OPERATION_BID_NEW_ITEM_MESSAGE);
             outputData.add(newBidItem.toString());
         } catch (NumberFormatException a) {
             outputData.add(BAD_INPUT_ERROR_MESSAGE);
@@ -253,9 +248,9 @@ public class BidController implements GenericController<Bid> {
         boolean bidCreated = this.bidDAO.create(newBid);
 
         if (bidCreated) {
-            outputData.add(CREATE_BID_SUCCESS_MESSAGE);
+            outputData.add(OPERATION_SUCCESS_MESSAGE);
         } else {
-            outputData.add(CREATE_BID_NOT_SUCCESS_MESSAGE);
+            outputData.add(OPERATION_NOT_SUCCESS_MESSAGE);
         }
 
         return outputData;

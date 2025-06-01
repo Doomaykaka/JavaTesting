@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.Currency;
 
 public class MonetaryAmount implements Serializable {
+    private static final long serialVersionUID = 1L;
     protected final BigDecimal value;
     protected final Currency currency;
 

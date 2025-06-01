@@ -7,7 +7,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.Root;
 
 import caveatemptor.models.Bid;
@@ -31,7 +30,7 @@ public class BidDAO implements GenericDAO<Bid> {
         CriteriaBuilder queryBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Bid> query = queryBuilder.createQuery(Bid.class);
         Root<Bid> fromBidsTable = query.from(Bid.class);
-        Fetch<Bid, Item> item = fromBidsTable.fetch(BID_FIELD_ITEM_NAME);
+        fromBidsTable.fetch(BID_FIELD_ITEM_NAME);
         query.select(fromBidsTable);
         query.where(queryBuilder.equal(fromBidsTable.get(BID_FIELD_ID_NAME), bid.getId()));
         bidItem = entityManager.createQuery(query).getSingleResult().getItem();

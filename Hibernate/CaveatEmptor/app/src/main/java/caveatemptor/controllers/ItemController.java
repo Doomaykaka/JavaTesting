@@ -34,8 +34,6 @@ public class ItemController implements GenericController<Item> {
     private static final String GET_ITEM_START_MESSAGE_SECOND_PART = ":";
     private static final String GET_ITEM_START_MESSAGE = "Items:";
     private static final String REMOVE_ITEM_START_MESSAGE = "Item remove:";
-    private static final String REMOVE_ITEM_SUCCESS_MESSAGE = "Success";
-    private static final String REMOVE_ITEM_NOT_SUCCESS_MESSAGE = "Not success";
     private static final String UPDATE_ITEM_START_MESSAGE = "Item update:";
     private static final String UPDATE_ITEM_SHOW_OLD_STATE_MESSAGE = "Old Item = ";
     private static final String UPDATE_ITEM_GET_ID_MESSAGE = "Input new Item Id (X if need old) - ";
@@ -46,12 +44,9 @@ public class ItemController implements GenericController<Item> {
     private static final String UPDATE_ITEM_GET_INITIAL_PRICE_MESSAGE = "Input new Initial price (like '12 USD', X if need old) - ";
     private static final String UPDATE_ITEM_GET_IMAGES_MESSAGE = "Input new Images (like 'image-image.png,image2-2/image.png', X if need old) - ";
     private static final String UPDATE_ITEM_GET_BIDS_MESSAGE = "Input new Bids identifiers (like '1,2,43', X if need old) - ";
-    private static final String UPDATE_ITEM_NEW_BIDS_MESSAGE = "New Item Bids:";
     private static final String SAVE_DATA_OLD_STATE_INPUT_VALUE = "X\n";
     private static final String ELEMENTS_INPUT_SEPARATOR_REGEXP = ",";
     private static final String KEY_VALUE_INPUT_SEPARATOR_REGEXP = "-";
-    private static final String UPDATE_ITEM_SUCCESS_MESSAGE = "Success";
-    private static final String UPDATE_ITEM_NOT_SUCCESS_MESSAGE = "Not success";
     private static final String CREATE_ITEM_START_MESSAGE = "Item create:";
     private static final String CREATE_ITEM_GET_ID_MESSAGE = "Input new Item Id - ";
     private static final String CREATE_ITEM_GET_NAME_MESSAGE = "Input new Item name - ";
@@ -61,10 +56,10 @@ public class ItemController implements GenericController<Item> {
     private static final String CREATE_ITEM_GET_INITIAL_PRICE_MESSAGE = "Input new Initial price (like '12 USD') - ";
     private static final String CREATE_ITEM_GET_IMAGES_MESSAGE = "Input new Images (like 'image-image.png,image2-2/image.png') - ";
     private static final String CREATE_ITEM_GET_BIDS_MESSAGE = "Input new Bids identifiers (like '1,2,43') - ";
-    private static final String CREATE_ITEM_NEW_BIDS_MESSAGE = "New Item Bids:";
-    private static final String CREATE_ITEM_SUCCESS_MESSAGE = "Success";
-    private static final String CREATE_ITEM_NOT_SUCCESS_MESSAGE = "Not success";
     private static final String BAD_INPUT_ERROR_MESSAGE = "Bad input!";
+    private static final String OPERATION_ITEM_SUCCESS_MESSAGE = "Success";
+    private static final String OPERATION_ITEM_NOT_SUCCESS_MESSAGE = "Not success";
+    private static final String OPERATION_ITEM_NEW_BIDS_MESSAGE = "New Item Bids:";
 
     public ItemController(EntityManagerFactory entityFactory, Scanner scan) {
         this.itemDAO = new ItemDAO(entityFactory);
@@ -142,9 +137,9 @@ public class ItemController implements GenericController<Item> {
         outputData.add(REMOVE_ITEM_START_MESSAGE);
 
         if (this.itemDAO.remove(id)) {
-            outputData.add(REMOVE_ITEM_SUCCESS_MESSAGE);
+            outputData.add(OPERATION_ITEM_SUCCESS_MESSAGE);
         } else {
-            outputData.add(REMOVE_ITEM_NOT_SUCCESS_MESSAGE);
+            outputData.add(OPERATION_ITEM_NOT_SUCCESS_MESSAGE);
         }
 
         return outputData;
@@ -238,7 +233,7 @@ public class ItemController implements GenericController<Item> {
             return outputData;
         }
 
-        outputData.add(UPDATE_ITEM_NEW_BIDS_MESSAGE);
+        outputData.add(OPERATION_ITEM_NEW_BIDS_MESSAGE);
         outputData.add(newBids.toString());
 
         foundItem.setId(newId);
@@ -252,9 +247,9 @@ public class ItemController implements GenericController<Item> {
         boolean itemUpdated = this.itemDAO.update(foundItem);
 
         if (itemUpdated) {
-            outputData.add(UPDATE_ITEM_SUCCESS_MESSAGE);
+            outputData.add(OPERATION_ITEM_SUCCESS_MESSAGE);
         } else {
-            outputData.add(UPDATE_ITEM_NOT_SUCCESS_MESSAGE);
+            outputData.add(OPERATION_ITEM_NOT_SUCCESS_MESSAGE);
         }
 
         return outputData;
@@ -482,7 +477,7 @@ public class ItemController implements GenericController<Item> {
             return outputData;
         }
 
-        outputData.add(CREATE_ITEM_NEW_BIDS_MESSAGE);
+        outputData.add(OPERATION_ITEM_NEW_BIDS_MESSAGE);
         outputData.add(newBids.toString());
 
         newItem.setId(newId);
@@ -496,9 +491,9 @@ public class ItemController implements GenericController<Item> {
         boolean itemCreated = this.itemDAO.create(newItem);
 
         if (itemCreated) {
-            outputData.add(CREATE_ITEM_SUCCESS_MESSAGE);
+            outputData.add(OPERATION_ITEM_SUCCESS_MESSAGE);
         } else {
-            outputData.add(CREATE_ITEM_NOT_SUCCESS_MESSAGE);
+            outputData.add(OPERATION_ITEM_NOT_SUCCESS_MESSAGE);
         }
 
         return outputData;

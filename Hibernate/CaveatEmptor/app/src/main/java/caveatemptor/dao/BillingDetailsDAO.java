@@ -7,12 +7,9 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.Root;
 
-import caveatemptor.models.Bid;
 import caveatemptor.models.BillingDetails;
-import caveatemptor.models.Item;
 import caveatemptor.models.User;
 
 public class BillingDetailsDAO implements GenericDAO<BillingDetails> {
@@ -33,7 +30,7 @@ public class BillingDetailsDAO implements GenericDAO<BillingDetails> {
         CriteriaBuilder queryBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<BillingDetails> query = queryBuilder.createQuery(BillingDetails.class);
         Root<BillingDetails> fromBillingDetailsTable = query.from(BillingDetails.class);
-        Fetch<BillingDetails, User> user = fromBillingDetailsTable.fetch(BILLING_DETAILS_FIELD_USER_NAME);
+        fromBillingDetailsTable.fetch(BILLING_DETAILS_FIELD_USER_NAME);
         query.select(fromBillingDetailsTable);
         query.where(queryBuilder.equal(fromBillingDetailsTable.get(BILLING_DETAILS_FIELD), billingDetails.getId()));
         billingDetailsUser = entityManager.createQuery(query).getSingleResult().getUser();

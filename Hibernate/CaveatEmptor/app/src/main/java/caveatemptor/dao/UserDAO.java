@@ -8,7 +8,6 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Fetch;
 import javax.persistence.criteria.Root;
 
 import caveatemptor.models.BillingDetails;
@@ -32,7 +31,7 @@ public class UserDAO implements GenericDAO<User> {
         CriteriaBuilder queryBuilder = entityManager.getCriteriaBuilder();
         CriteriaQuery<User> query = queryBuilder.createQuery(User.class);
         Root<User> fromUsersTable = query.from(User.class);
-        Fetch<User, BillingDetails> billingDetails = fromUsersTable.fetch(USER_FIELD_BILLING_DETAILS_NAME);
+        fromUsersTable.fetch(USER_FIELD_BILLING_DETAILS_NAME);
         query.select(fromUsersTable);
         query.where(queryBuilder.equal(fromUsersTable.get(USER_FIELD_ID_NAME), user.getId()));
         userBillingDetails = entityManager.createQuery(query).getSingleResult().getBillingDetails();
@@ -49,8 +48,8 @@ public class UserDAO implements GenericDAO<User> {
         EntityManager entityManager = this.entityFactory.createEntityManager();
         EntityTransaction entityTransaction = entityManager.getTransaction();
 
-        userToUpdate = entityManager.find(User.class, userToUpdate.getId());
-        billingDetailsToConnect = entityManager.find(BillingDetails.class, billingDetailsToConnect.getId());
+        userToUpdate = entityManager.find(User.class, user.getId());
+        billingDetailsToConnect = entityManager.find(BillingDetails.class, billingDetails.getId());
         userUpdated = userToUpdate != null && billingDetailsToConnect != null;
 
         if (userUpdated) {
@@ -77,7 +76,7 @@ public class UserDAO implements GenericDAO<User> {
         EntityManager entityManager = this.entityFactory.createEntityManager();
         EntityTransaction entityTransaction = entityManager.getTransaction();
 
-        userToUpdate = entityManager.find(User.class, userToUpdate.getId());
+        userToUpdate = entityManager.find(User.class, user.getId());
         billingDetailsToDisconnect = entityManager.find(BillingDetails.class, billingDetails.getId());
         userUpdated = userToUpdate != null && billingDetailsToDisconnect != null;
 
