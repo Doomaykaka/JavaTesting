@@ -36,7 +36,6 @@ public class ItemController implements GenericController<Item> {
     private static final String REMOVE_ITEM_START_MESSAGE = "Item remove:";
     private static final String UPDATE_ITEM_START_MESSAGE = "Item update:";
     private static final String UPDATE_ITEM_SHOW_OLD_STATE_MESSAGE = "Old Item = ";
-    private static final String UPDATE_ITEM_GET_ID_MESSAGE = "Input new Item Id (X if need old) - ";
     private static final String UPDATE_ITEM_GET_NAME_MESSAGE = "Input new Item name (X if need old) - ";
     private static final String UPDATE_ITEM_GET_AUCTION_END_MESSAGE = "Input new Auction end date (like '1999-01-01', X if need old) - ";
     private static final String UPDATE_ITEM_GET_AUCTION_TYPE_MESSAGE = "Input new Auction type (like 'HIGHEST_BID', 'LOWEST_BID' or 'FIXED_PRICE', X if need old) - ";
@@ -49,7 +48,6 @@ public class ItemController implements GenericController<Item> {
     private static final String ELEMENTS_INPUT_SEPARATOR_REGEXP = ",";
     private static final String KEY_VALUE_INPUT_SEPARATOR_REGEXP = "-";
     private static final String CREATE_ITEM_START_MESSAGE = "Item create:";
-    private static final String CREATE_ITEM_GET_ID_MESSAGE = "Input new Item Id - ";
     private static final String CREATE_ITEM_GET_NAME_MESSAGE = "Input new Item name - ";
     private static final String CREATE_ITEM_GET_AUCTION_END_MESSAGE = "Input new Auction end date (like '1999-01-01') - ";
     private static final String CREATE_ITEM_GET_AUCTION_TYPE_MESSAGE = "Input new Auction type (like 'HIGHEST_BID', 'LOWEST_BID' or 'FIXED_PRICE') - ";
@@ -162,16 +160,6 @@ public class ItemController implements GenericController<Item> {
 
         outputData.add(UPDATE_ITEM_SHOW_OLD_STATE_MESSAGE + foundItem.toString());
 
-        Long newId = -1L;
-
-        try {
-            newId = readId(foundItem);
-        } catch (NumberFormatException a) {
-            outputData.add(BAD_INPUT_ERROR_MESSAGE);
-
-            return outputData;
-        }
-
         String newName = readName(foundItem);
 
         Date newAuctionEnd = null;
@@ -237,7 +225,6 @@ public class ItemController implements GenericController<Item> {
         outputData.add(OPERATION_ITEM_NEW_BIDS_MESSAGE);
         outputData.add(newBids.toString());
 
-        foundItem.setId(newId);
         foundItem.setName(newName);
         foundItem.setAuctionEnd(newAuctionEnd);
         foundItem.setAuctionType(newAuctionType);
@@ -254,20 +241,6 @@ public class ItemController implements GenericController<Item> {
         }
 
         return outputData;
-    }
-
-    private Long readId(Item foundItem) throws NumberFormatException {
-        Long newId = -1L;
-
-        String newIdInput = ConsoleUtils.readLineWithQuestion(scan, UPDATE_ITEM_GET_ID_MESSAGE);
-
-        if (newIdInput.equals(SAVE_DATA_OLD_STATE_INPUT_VALUE)) {
-            newId = foundItem.getId();
-        } else {
-            newId = Long.parseLong(newIdInput);
-        }
-
-        return newId;
     }
 
     private String readName(Item foundItem) {
@@ -395,11 +368,12 @@ public class ItemController implements GenericController<Item> {
         List<Bid> oldBidsList = this.itemDAO.getItemBids(foundItem);
 
         for (Bid bid : oldBidsList) {
-            this.itemDAO.removeItemBid(foundItem, bid);
+            bid.setItem(null);
         }
 
         for (Bid bid : bidsList) {
-            this.itemDAO.setItemBid(foundItem, bid);
+            foundItem.addBid(bid);
+            bid.setItem(foundItem);
         }
 
         return bidsList;
@@ -412,16 +386,6 @@ public class ItemController implements GenericController<Item> {
         outputData.add(CREATE_ITEM_START_MESSAGE);
 
         Item newItem = new Item();
-
-        Long newId = -1L;
-
-        try {
-            newId = readId();
-        } catch (NumberFormatException a) {
-            outputData.add(BAD_INPUT_ERROR_MESSAGE);
-
-            return outputData;
-        }
 
         String newName = readName();
 
@@ -463,16 +427,6 @@ public class ItemController implements GenericController<Item> {
             return outputData;
         }
 
-        newItem.setId(newId);
-        newItem.setName(newName);
-        newItem.setAuctionEnd(newAuctionEnd);
-        newItem.setAuctionType(newAuctionType);
-        newItem.setBuyNowPrice(newBuyNowPrice);
-        newItem.setInitialPrice(newInitialPrice);
-        newItem.setImages(newImages);
-
-        boolean itemCreated = this.itemDAO.create(newItem);
-
         List<Bid> newBids = null;
 
         try {
@@ -496,6 +450,15 @@ public class ItemController implements GenericController<Item> {
         outputData.add(OPERATION_ITEM_NEW_BIDS_MESSAGE);
         outputData.add(newBids.toString());
 
+        newItem.setName(newName);
+        newItem.setAuctionEnd(newAuctionEnd);
+        newItem.setAuctionType(newAuctionType);
+        newItem.setBuyNowPrice(newBuyNowPrice);
+        newItem.setInitialPrice(newInitialPrice);
+        newItem.setImages(newImages);
+
+        boolean itemCreated = this.itemDAO.create(newItem);
+
         if (itemCreated) {
             outputData.add(OPERATION_ITEM_SUCCESS_MESSAGE);
         } else {
@@ -503,15 +466,6 @@ public class ItemController implements GenericController<Item> {
         }
 
         return outputData;
-    }
-
-    private Long readId() throws NumberFormatException {
-        Long newId = -1L;
-
-        String newIdInput = ConsoleUtils.readLineWithQuestion(scan, CREATE_ITEM_GET_ID_MESSAGE);
-        newId = Long.parseLong(newIdInput);
-
-        return newId;
     }
 
     private String readName() {
@@ -604,7 +558,8 @@ public class ItemController implements GenericController<Item> {
         List<Bid> bidsList = List.copyOf(newBids);
 
         for (Bid bid : bidsList) {
-            this.itemDAO.setItemBid(foundItem, bid);
+            foundItem.addBid(bid);
+            bid.setItem(foundItem);
         }
 
         return bidsList;

@@ -35,10 +35,6 @@ public abstract class BillingDetails {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getOwner() {
         return owner;
     }

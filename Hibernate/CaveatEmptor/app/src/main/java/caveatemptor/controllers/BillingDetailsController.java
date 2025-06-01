@@ -27,7 +27,6 @@ public class BillingDetailsController implements GenericController<BillingDetail
     private static final String REMOVE_BILLING_DETAILS_START_MESSAGE = "Billing details remove:";
     private static final String UPDATE_BILLING_DETAILS_START_MESSAGE = "Billing details update:";
     private static final String UPDATE_BILLING_DETAILS_SHOW_OLD_STATE_MESSAGE = "Old billing details = ";
-    private static final String UPDATE_BILLING_DETAILS_GET_ID_MESSAGE = "Input new Billing details Id (X if need old) - ";
     private static final String UPDATE_BILLING_DETAILS_GET_OWNER_MESSAGE = "Input new Billing details Owner (X if need old) - ";
     private static final String UPDATE_BILLING_DETAILS_GET_USER_ID_MESSAGE = "Input new Billing details User Id (X if need old) - ";
     private static final String UPDATE_BILLING_DETAILS_NEED_TYPE_UPDATE_MESSAGE = "Do I need to change the type and exact information of the payment method (Yes, No) ?";
@@ -35,7 +34,6 @@ public class BillingDetailsController implements GenericController<BillingDetail
     private static final String NO_INPUT_VALUE = "No";
     private static final String SAVE_DATA_OLD_STATE_INPUT_VALUE = "X";
     private static final String CREATE_BILLING_DETAILS_START_MESSAGE = "Billing details create:";
-    private static final String CREATE_BILLING_DETAILS_GET_ID_MESSAGE = "Input new Billing details Id - ";
     private static final String CREATE_BILLING_DETAILS_GET_OWNER_MESSAGE = "Input new Billing details Owner - ";
     private static final String CREATE_BILLING_DETAILS_GET_USER_ID_MESSAGE = "Input new Billing details User Id - ";
     private static final String BAD_INPUT_ERROR_MESSAGE = "Bad input!";
@@ -148,17 +146,8 @@ public class BillingDetailsController implements GenericController<BillingDetail
 
         outputData.add(UPDATE_BILLING_DETAILS_SHOW_OLD_STATE_MESSAGE + foundBillingDetails.toString());
 
-        Long newId = -1L;
         String newOwner = "";
         User newUser = null;
-
-        try {
-            newId = readId(foundBillingDetails);
-        } catch (NumberFormatException a) {
-            outputData.add(BAD_INPUT_ERROR_MESSAGE);
-
-            return outputData;
-        }
 
         try {
             newOwner = readOwner(foundBillingDetails);
@@ -193,7 +182,6 @@ public class BillingDetailsController implements GenericController<BillingDetail
         }
 
         if (!needUpdate) {
-            foundBillingDetails.setId(newId);
             foundBillingDetails.setOwner(newOwner);
 
             boolean billingDetailsUpdated = this.billingDetailsDAO.update(foundBillingDetails);
@@ -221,7 +209,6 @@ public class BillingDetailsController implements GenericController<BillingDetail
             String swift = ConsoleUtils.readLineWithQuestion(scan,
                     OPERATION_BILLING_DETAILS_BANK_ACCOUNT_GET_SWIFT_MESSAGE);
 
-            bankAccount.setId(newId);
             bankAccount.setOwner(newOwner);
 
             bankAccount.setAccount(account);
@@ -247,12 +234,19 @@ public class BillingDetailsController implements GenericController<BillingDetail
             String expYear = ConsoleUtils.readLineWithQuestion(scan,
                     OPERATION_BILLING_DETAILS_CREDIT_CARD_GET_EXP_YEAR);
 
-            creditCard.setId(newId);
             creditCard.setOwner(newOwner);
 
             creditCard.setCardNumber(cardNumber);
             creditCard.setExpMonth(expMonth);
             creditCard.setExpYear(expYear);
+
+            boolean creditCardUpdated = this.billingDetailsDAO.update(creditCard);
+
+            if (creditCardUpdated) {
+                outputData.add(OPERATION_BILLING_DETAILS_SUCCESS_MESSAGE);
+            } else {
+                outputData.add(OPERATION_BILLING_DETAILS_NOT_SUCCESS_MESSAGE);
+            }
 
             break;
         default:
@@ -264,20 +258,6 @@ public class BillingDetailsController implements GenericController<BillingDetail
         outputData.add(OPERATION_BILLING_DETAILS_SHOW_NEW_STATE_MESSAGE + foundBillingDetails.toString());
 
         return outputData;
-    }
-
-    private Long readId(BillingDetails foundBillingDetails) throws NumberFormatException {
-        Long newId = -1L;
-
-        String newIdInput = ConsoleUtils.readLineWithQuestion(scan, UPDATE_BILLING_DETAILS_GET_ID_MESSAGE);
-
-        if (newIdInput.equals(SAVE_DATA_OLD_STATE_INPUT_VALUE)) {
-            newId = foundBillingDetails.getId();
-        } else {
-            newId = Long.parseLong(newIdInput);
-        }
-
-        return newId;
     }
 
     private String readOwner(BillingDetails foundBillingDetails) {
@@ -310,8 +290,8 @@ public class BillingDetailsController implements GenericController<BillingDetail
         User newBillingDetailsUser = this.userDAO.get(newUserId);
 
         if (newBillingDetailsUser != null) {
-            this.billingDetailsDAO.removeBillingDetailsUser(foundBillingDetails, billingDetailsUser);
-            this.billingDetailsDAO.setBillingDetailsUser(foundBillingDetails, newBillingDetailsUser);
+            foundBillingDetails.setUser(newBillingDetailsUser);
+            newBillingDetailsUser.addBillingDetail(foundBillingDetails);
         }
 
         return newBillingDetailsUser;
@@ -324,16 +304,6 @@ public class BillingDetailsController implements GenericController<BillingDetail
         outputData.add(CREATE_BILLING_DETAILS_START_MESSAGE);
 
         BillingDetails newBillingDetails = null;
-
-        Long newId = -1L;
-
-        try {
-            newId = readNewId();
-        } catch (NumberFormatException a) {
-            outputData.add(BAD_INPUT_ERROR_MESSAGE);
-
-            return outputData;
-        }
 
         String newOwner = "";
 
@@ -372,16 +342,15 @@ public class BillingDetailsController implements GenericController<BillingDetail
             String swift = ConsoleUtils.readLineWithQuestion(scan,
                     OPERATION_BILLING_DETAILS_BANK_ACCOUNT_GET_SWIFT_MESSAGE);
 
-            bankAccount.setId(newId);
             bankAccount.setOwner(newOwner);
             bankAccount.setAccount(account);
             bankAccount.setBankname(bankname);
             bankAccount.setSwift(swift);
 
-            boolean bankAccountCreated = this.billingDetailsDAO.create(bankAccount);
+            bankAccount.setUser(newUser);
+            newUser.addBillingDetail(bankAccount);
 
-            this.billingDetailsDAO.removeBillingDetailsUser(bankAccount, newUser);
-            this.billingDetailsDAO.setBillingDetailsUser(bankAccount, newUser);
+            boolean bankAccountCreated = this.billingDetailsDAO.create(bankAccount);
 
             if (bankAccountCreated) {
                 outputData.add(OPERATION_BILLING_DETAILS_SUCCESS_MESSAGE);
@@ -402,16 +371,15 @@ public class BillingDetailsController implements GenericController<BillingDetail
             String expYear = ConsoleUtils.readLineWithQuestion(scan,
                     OPERATION_BILLING_DETAILS_CREDIT_CARD_GET_EXP_YEAR);
 
-            creditCard.setId(newId);
             creditCard.setOwner(newOwner);
             creditCard.setCardNumber(cardNumber);
             creditCard.setExpMonth(expMonth);
             creditCard.setExpYear(expYear);
 
-            boolean creditCardCreated = this.billingDetailsDAO.create(creditCard);
+            creditCard.setUser(newUser);
+            newUser.addBillingDetail(creditCard);
 
-            this.billingDetailsDAO.removeBillingDetailsUser(creditCard, newUser);
-            this.billingDetailsDAO.setBillingDetailsUser(creditCard, newUser);
+            boolean creditCardCreated = this.billingDetailsDAO.create(creditCard);
 
             if (creditCardCreated) {
                 outputData.add(OPERATION_BILLING_DETAILS_SUCCESS_MESSAGE);
@@ -431,15 +399,6 @@ public class BillingDetailsController implements GenericController<BillingDetail
         outputData.add(OPERATION_BILLING_DETAILS_SHOW_NEW_STATE_MESSAGE + newBillingDetails.toString());
 
         return outputData;
-    }
-
-    private Long readNewId() throws NumberFormatException {
-        Long newId = -1L;
-
-        String newIdInput = ConsoleUtils.readLineWithQuestion(scan, CREATE_BILLING_DETAILS_GET_ID_MESSAGE);
-        newId = Long.parseLong(newIdInput);
-
-        return newId;
     }
 
     private String readOwner() {

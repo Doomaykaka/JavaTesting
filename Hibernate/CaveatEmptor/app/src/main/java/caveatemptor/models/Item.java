@@ -39,7 +39,7 @@ public class Item {
     @Id
     @SequenceGenerator(name = "item_seq", sequenceName = "item_sequence", initialValue = 1, allocationSize = 20)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "item_seq")
-    private Long id = -1L;
+    private Long id = null;
 
     @NotNull
     @Size(min = 2, max = 255, message = "Name is required, maximum 255 characters.")
@@ -83,10 +83,6 @@ public class Item {
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public void addBid(Bid itemBid) {

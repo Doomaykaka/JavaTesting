@@ -47,70 +47,6 @@ public class BillingDetailsDAO implements GenericDAO<BillingDetails> {
         return billingDetailsUser;
     }
 
-    public boolean setBillingDetailsUser(BillingDetails billingDetails, User user) {
-        boolean billingDetailsUpdated = false;
-
-        if (billingDetails == null || user == null) {
-            return billingDetailsUpdated;
-        }
-
-        BillingDetails billingDetailsToUpdate = null;
-        User userToConnect = null;
-
-        EntityManager entityManager = this.entityFactory.createEntityManager();
-        EntityTransaction entityTransaction = entityManager.getTransaction();
-
-        billingDetailsToUpdate = entityManager.find(BillingDetails.class, billingDetails.getId());
-        userToConnect = entityManager.find(User.class, user.getId());
-        billingDetailsUpdated = billingDetailsToUpdate != null && userToConnect != null;
-
-        if (billingDetailsUpdated) {
-            entityTransaction.begin();
-
-            billingDetailsToUpdate.setUser(userToConnect);
-            userToConnect.addBillingDetail(billingDetailsToUpdate);
-
-            entityManager.merge(billingDetailsToUpdate);
-            entityManager.merge(userToConnect);
-
-            entityTransaction.commit();
-        }
-
-        return billingDetailsUpdated;
-    }
-
-    public boolean removeBillingDetailsUser(BillingDetails billingDetails, User user) {
-        boolean billingDetailsUpdated = false;
-
-        if (billingDetails == null || user == null) {
-            return billingDetailsUpdated;
-        }
-
-        BillingDetails billingDetailsToUpdate = null;
-        User userToDisconnect = null;
-
-        EntityManager entityManager = this.entityFactory.createEntityManager();
-        EntityTransaction entityTransaction = entityManager.getTransaction();
-
-        billingDetailsToUpdate = entityManager.find(BillingDetails.class, billingDetails.getId());
-        userToDisconnect = entityManager.find(User.class, user.getId());
-        billingDetailsUpdated = billingDetailsToUpdate != null && userToDisconnect != null;
-
-        if (billingDetailsUpdated) {
-            entityTransaction.begin();
-
-            billingDetailsToUpdate.setUser(null);
-            userToDisconnect.getBillingDetails().remove(billingDetailsToUpdate);
-
-            entityManager.merge(billingDetailsToUpdate);
-            entityManager.merge(userToDisconnect);
-
-            entityTransaction.commit();
-        }
-
-        return billingDetailsUpdated;
-    }
-
     @Override
     public BillingDetails get(long id) {
         BillingDetails foundBillingDetails = null;
@@ -195,31 +131,14 @@ public class BillingDetailsDAO implements GenericDAO<BillingDetails> {
             return billingDetailsCreated;
         }
 
-        BillingDetails billingDetailsToCreate = null;
-
         EntityManager entityManager = this.entityFactory.createEntityManager();
         EntityTransaction entityTransaction = entityManager.getTransaction();
 
-        Long oldId = entity.getId();
+        entityTransaction.begin();
+        entityManager.merge(entity);
+        entityTransaction.commit();
 
-        billingDetailsToCreate = entityManager.find(BillingDetails.class, entity.getId());
-        billingDetailsCreated = billingDetailsToCreate != null;
-
-        if (!billingDetailsCreated) {
-            entityTransaction.begin();
-
-            entity.setId(null);
-
-            entityManager.merge(entity);
-
-            entityTransaction.commit();
-
-            billingDetailsCreated = entity != null;
-
-            if (billingDetailsCreated) {
-                entity.setId(oldId);
-            }
-        }
+        billingDetailsCreated = entity != null;
 
         return billingDetailsCreated;
     }

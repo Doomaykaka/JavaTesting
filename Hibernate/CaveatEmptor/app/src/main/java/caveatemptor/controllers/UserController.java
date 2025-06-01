@@ -31,7 +31,6 @@ public class UserController implements GenericController<User> {
     private static final String REMOVE_USER_START_MESSAGE = "User remove:";
     private static final String UPDATE_USER_START_MESSAGE = "User update:";
     private static final String UPDATE_USER_SHOW_OLD_STATE_MESSAGE = "Old User = ";
-    private static final String UPDATE_USER_GET_ID_MESSAGE = "Input new User Id (X if need old) - ";
     private static final String UPDATE_USER_GET_FIRSTNAME_MESSAGE = "Input new User firstname (X if need old) - ";
     private static final String UPDATE_USER_GET_LASTNAME_MESSAGE = "Input new User lastname (X if need old) - ";
     private static final String UPDATE_USER_NEED_ADDRESS_TYPE_UPDATE_MESSAGE = "Do I need to change the type and exact information of the address (Yes, No) ?";
@@ -42,7 +41,6 @@ public class UserController implements GenericController<User> {
     private static final String YES_INPUT_VALUE = "Yes";
     private static final String NO_INPUT_VALUE = "No";
     private static final String CREATE_USER_START_MESSAGE = "User create:";
-    private static final String CREATE_USER_GET_ID_MESSAGE = "Input new User Id - ";
     private static final String CREATE_USER_GET_FIRSTNAME_MESSAGE = "Input new User firstname - ";
     private static final String CREATE_USER_GET_LASTNAME_MESSAGE = "Input new User lastname - ";
     private static final String CREATE_USER_GET_BILLING_DETAILS_MESSAGE = "Input new Billing details identifiers (like '1,2,43') - ";
@@ -159,19 +157,10 @@ public class UserController implements GenericController<User> {
 
         outputData.add(UPDATE_USER_SHOW_OLD_STATE_MESSAGE + foundUser.toString());
 
-        Long newId = -1L;
         String newFirstname = "";
         String newLastname = "";
         Address newAddress = null;
         Set<BillingDetails> newBillingDetails = null;
-
-        try {
-            newId = readId(foundUser);
-        } catch (NumberFormatException a) {
-            outputData.add(BAD_INPUT_ERROR_MESSAGE);
-
-            return outputData;
-        }
 
         try {
             newFirstname = readFirstname(foundUser);
@@ -223,7 +212,6 @@ public class UserController implements GenericController<User> {
         }
 
         if (!needUpdate) {
-            foundUser.setId(newId);
             foundUser.setFirstname(newFirstname);
             foundUser.setLastname(newLastname);
 
@@ -252,7 +240,6 @@ public class UserController implements GenericController<User> {
 
             newAddress = new Address(street, addressZipcode, city);
 
-            foundUser.setId(newId);
             foundUser.setFirstname(newFirstname);
             foundUser.setLastname(newLastname);
 
@@ -276,20 +263,6 @@ public class UserController implements GenericController<User> {
         outputData.add(OPERATION_USER_SHOW_NEW_STATE_MESSAGE + foundUser.toString());
 
         return outputData;
-    }
-
-    private Long readId(User foundUser) throws NumberFormatException {
-        Long newId = -1L;
-
-        String newIdInput = ConsoleUtils.readLineWithQuestion(scan, UPDATE_USER_GET_ID_MESSAGE);
-
-        if (newIdInput.equals(SAVE_DATA_OLD_STATE_INPUT_VALUE)) {
-            newId = foundUser.getId();
-        } else {
-            newId = Long.parseLong(newIdInput);
-        }
-
-        return newId;
     }
 
     private String readFirstname(User foundUser) {
@@ -354,11 +327,12 @@ public class UserController implements GenericController<User> {
         List<BillingDetails> oldbillingDetailsList = this.userDAO.getUserBillingDetails(foundUser);
 
         for (BillingDetails billingDetails : oldbillingDetailsList) {
-            this.userDAO.removeUserBillingDetails(foundUser, billingDetails);
+            billingDetails.setUser(null);
         }
 
         for (BillingDetails billingDetails : newBillingDetails) {
-            this.userDAO.setUserBillingDetails(foundUser, billingDetails);
+            foundUser.addBillingDetail(billingDetails);
+            billingDetails.setUser(foundUser);
         }
 
         return newBillingDetails;
@@ -372,19 +346,10 @@ public class UserController implements GenericController<User> {
 
         User newUser = new User();
 
-        Long newId = -1L;
         String newFirstname = "";
         String newLastname = "";
         Address newAddress = null;
         Set<BillingDetails> newBillingDetails = null;
-
-        try {
-            newId = readId();
-        } catch (NumberFormatException a) {
-            outputData.add(BAD_INPUT_ERROR_MESSAGE);
-
-            return outputData;
-        }
 
         try {
             newFirstname = readFirstname();
@@ -416,13 +381,10 @@ public class UserController implements GenericController<User> {
 
             newAddress = new Address(street, addressZipcode, city);
 
-            newUser.setId(newId);
             newUser.setFirstname(newFirstname);
             newUser.setLastname(newLastname);
 
             newUser.setAddress(newAddress);
-
-            boolean userCreated = this.userDAO.create(newUser);
 
             try {
                 newBillingDetails = readAndSetBillingDetails(newUser);
@@ -445,6 +407,8 @@ public class UserController implements GenericController<User> {
             outputData.add(OPERATION_USER_NEW_BILLING_DETAILS_MESSAGE);
             outputData.add(newBillingDetails.toString());
 
+            boolean userCreated = this.userDAO.create(newUser);
+
             if (userCreated) {
                 outputData.add(OPERATION_USER_SUCCESS_MESSAGE);
             } else {
@@ -461,15 +425,6 @@ public class UserController implements GenericController<User> {
         outputData.add(OPERATION_USER_SHOW_NEW_STATE_MESSAGE + newUser.toString());
 
         return outputData;
-    }
-
-    private Long readId() throws NumberFormatException {
-        Long newId = -1L;
-
-        String newIdInput = ConsoleUtils.readLineWithQuestion(scan, CREATE_USER_GET_ID_MESSAGE);
-        newId = Long.parseLong(newIdInput);
-
-        return newId;
     }
 
     private String readFirstname() {
@@ -514,7 +469,8 @@ public class UserController implements GenericController<User> {
         }
 
         for (BillingDetails billingDetails : newBillingDetails) {
-            this.userDAO.setUserBillingDetails(foundUser, billingDetails);
+            foundUser.addBillingDetail(billingDetails);
+            billingDetails.setUser(foundUser);
         }
 
         return newBillingDetails;

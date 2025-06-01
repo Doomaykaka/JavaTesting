@@ -19,7 +19,7 @@ public class Bid {
     @Id
     @SequenceGenerator(name = "bid_seq", sequenceName = "bid_sequence", initialValue = 1, allocationSize = 20)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "bid_seq")
-    private Long id = -1L;
+    private Long id = null;
 
     @ManyToOne()
     private Item item;
@@ -34,10 +34,6 @@ public class Bid {
 
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     @Override

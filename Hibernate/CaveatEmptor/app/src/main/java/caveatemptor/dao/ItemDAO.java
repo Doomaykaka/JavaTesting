@@ -47,70 +47,6 @@ public class ItemDAO implements GenericDAO<Item> {
         return itemBids;
     }
 
-    public boolean setItemBid(Item item, Bid bid) {
-        boolean itemUpdated = false;
-
-        if (item == null || bid == null) {
-            return itemUpdated;
-        }
-
-        Item itemToUpdate = null;
-        Bid bidToConnect = null;
-
-        EntityManager entityManager = this.entityFactory.createEntityManager();
-        EntityTransaction entityTransaction = entityManager.getTransaction();
-
-        itemToUpdate = entityManager.find(Item.class, item.getId());
-        bidToConnect = entityManager.find(Bid.class, bid.getId());
-        itemUpdated = itemToUpdate != null && bidToConnect != null;
-
-        if (itemUpdated) {
-            entityTransaction.begin();
-
-            itemToUpdate.addBid(bidToConnect);
-            bidToConnect.setItem(itemToUpdate);
-
-            entityManager.merge(itemToUpdate);
-            entityManager.merge(bidToConnect);
-
-            entityTransaction.commit();
-        }
-
-        return itemUpdated;
-    }
-
-    public boolean removeItemBid(Item item, Bid bid) {
-        boolean itemUpdated = false;
-
-        if (item == null || bid == null) {
-            return itemUpdated;
-        }
-
-        Item itemToUpdate = null;
-        Bid bidToDisconnect = null;
-
-        EntityManager entityManager = this.entityFactory.createEntityManager();
-        EntityTransaction entityTransaction = entityManager.getTransaction();
-
-        itemToUpdate = entityManager.find(Item.class, item.getId());
-        bidToDisconnect = entityManager.find(Bid.class, bid.getId());
-        itemUpdated = itemToUpdate != null && bidToDisconnect != null;
-
-        if (itemUpdated) {
-            entityTransaction.begin();
-
-            itemToUpdate.getBids().remove(bidToDisconnect);
-            bidToDisconnect.setItem(null);
-
-            entityManager.merge(itemToUpdate);
-            entityManager.merge(bidToDisconnect);
-
-            entityTransaction.commit();
-        }
-
-        return itemUpdated;
-    }
-
     @Override
     public Item get(long id) {
         Item foundItem = null;
@@ -195,31 +131,14 @@ public class ItemDAO implements GenericDAO<Item> {
             return itemCreated;
         }
 
-        Item itemToCreate = null;
-
         EntityManager entityManager = this.entityFactory.createEntityManager();
         EntityTransaction entityTransaction = entityManager.getTransaction();
 
-        Long oldId = entity.getId();
+        entityTransaction.begin();
+        entityManager.persist(entity);
+        entityTransaction.commit();
 
-        itemToCreate = entityManager.find(Item.class, entity.getId());
-        itemCreated = itemToCreate != null;
-
-        if (!itemCreated) {
-            entityTransaction.begin();
-
-            entity.setId(null);
-
-            entityManager.persist(entity);
-
-            entityTransaction.commit();
-
-            itemCreated = entity != null;
-
-            if (itemCreated) {
-                entity.setId(oldId);
-            }
-        }
+        itemCreated = entity != null;
 
         return itemCreated;
     }

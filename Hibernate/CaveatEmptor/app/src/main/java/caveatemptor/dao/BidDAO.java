@@ -47,70 +47,6 @@ public class BidDAO implements GenericDAO<Bid> {
         return bidItem;
     }
 
-    public boolean setBidItem(Bid bid, Item item) {
-        boolean bidUpdated = false;
-
-        if (bid == null || item == null) {
-            return bidUpdated;
-        }
-
-        Bid bidToUpdate = null;
-        Item itemToConnect = null;
-
-        EntityManager entityManager = this.entityFactory.createEntityManager();
-        EntityTransaction entityTransaction = entityManager.getTransaction();
-
-        bidToUpdate = entityManager.find(Bid.class, bid.getId());
-        itemToConnect = entityManager.find(Item.class, item.getId());
-        bidUpdated = bidToUpdate != null && itemToConnect != null;
-
-        if (bidUpdated) {
-            entityTransaction.begin();
-
-            bidToUpdate.setItem(itemToConnect);
-            itemToConnect.addBid(bidToUpdate);
-
-            entityManager.merge(bidToUpdate);
-            entityManager.merge(itemToConnect);
-
-            entityTransaction.commit();
-        }
-
-        return bidUpdated;
-    }
-
-    public boolean removeBidItem(Bid bid, Item item) {
-        boolean bidUpdated = false;
-
-        if (bid == null || item == null) {
-            return bidUpdated;
-        }
-
-        Bid bidToUpdate = null;
-        Item itemToDisconnect = null;
-
-        EntityManager entityManager = this.entityFactory.createEntityManager();
-        EntityTransaction entityTransaction = entityManager.getTransaction();
-
-        bidToUpdate = entityManager.find(Bid.class, bid.getId());
-        itemToDisconnect = entityManager.find(Item.class, item.getId());
-        bidUpdated = bidToUpdate != null && itemToDisconnect != null;
-
-        if (bidUpdated) {
-            entityTransaction.begin();
-
-            bidToUpdate.setItem(null);
-            itemToDisconnect.getBids().remove(bidToUpdate);
-
-            entityManager.merge(bidToUpdate);
-            entityManager.merge(itemToDisconnect);
-
-            entityTransaction.commit();
-        }
-
-        return bidUpdated;
-    }
-
     @Override
     public Bid get(long id) {
         Bid foundBid = null;
@@ -195,31 +131,14 @@ public class BidDAO implements GenericDAO<Bid> {
             return bidCreated;
         }
 
-        Bid bidToCreate = null;
-
         EntityManager entityManager = this.entityFactory.createEntityManager();
         EntityTransaction entityTransaction = entityManager.getTransaction();
 
-        Long oldId = entity.getId();
+        entityTransaction.begin();
+        entityManager.persist(entity);
+        entityTransaction.commit();
 
-        bidToCreate = entityManager.find(Bid.class, oldId);
-        bidCreated = bidToCreate != null;
-
-        if (!bidCreated) {
-            entityTransaction.begin();
-
-            entity.setId(null);
-
-            entityManager.persist(entity);
-
-            entityTransaction.commit();
-
-            bidCreated = entity != null;
-
-            if (bidCreated) {
-                entity.setId(oldId);
-            }
-        }
+        bidCreated = entity != null;
 
         return bidCreated;
     }
