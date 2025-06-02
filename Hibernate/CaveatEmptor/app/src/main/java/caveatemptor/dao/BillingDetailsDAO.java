@@ -135,7 +135,7 @@ public class BillingDetailsDAO implements GenericDAO<BillingDetails> {
         EntityTransaction entityTransaction = entityManager.getTransaction();
 
         entityTransaction.begin();
-        entityManager.merge(entity);
+        entityManager.persist(entity);
         entityTransaction.commit();
 
         billingDetailsCreated = entity != null;

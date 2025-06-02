@@ -23,7 +23,7 @@ public abstract class BillingDetails {
     @Id
     @SequenceGenerator(name = "billing_seq", sequenceName = "billing_sequence", initialValue = 1, allocationSize = 20)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "billing_seq")
-    private Long id = -1L;
+    private Long id = null;
 
     @NotNull
     private String owner;

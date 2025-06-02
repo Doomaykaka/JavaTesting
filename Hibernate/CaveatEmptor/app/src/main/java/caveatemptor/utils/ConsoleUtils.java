@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleUtils {
-    private static final String QUESTION_SEPARATOR = ":";
+    private static final String QUESTION_SEPARATOR = ": ";
 
     public static String readLineWithQuestion(Scanner scan, String question) {
         String result = "";
