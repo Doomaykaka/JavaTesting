@@ -23,6 +23,21 @@ public class App {
 
         TestDAO testDAO = prepareDAO(configReader);
 
+        testFlyway(testDAO, configReader);
+    }
+
+    private static TestDAO prepareDAO(ApplicationConfigReader configReader) throws FileNotFoundException, IOException {
+        TestDAO testDAO = null;
+
+        HiberConfiguration.addEntity(Test.class);
+        HiberConfiguration.build(configReader);
+
+        testDAO = new TestDAO(HiberConfiguration.getEntityManagerFactory());
+
+        return testDAO;
+    }
+
+    private static void testFlyway(TestDAO testDAO, ApplicationConfigReader configReader) {
         // Init
 
         FluentConfiguration flywayConfig = Flyway.configure();
@@ -41,6 +56,8 @@ public class App {
         // Info
 
         MigrationInfoService service = flyway.info();
+
+        System.out.println("Migrations info:");
 
         for (InfoOutput info : service.getInfoResult().migrations) {
             System.out.println(info.getDescription() + " " + info.getVersion());
@@ -72,16 +89,12 @@ public class App {
 
         // flyway.undo();
 
-    }
+        // Get all tests
 
-    private static TestDAO prepareDAO(ApplicationConfigReader configReader) throws FileNotFoundException, IOException {
-        TestDAO testDAO = null;
+        System.out.println("Tests:");
 
-        HiberConfiguration.addEntity(Test.class);
-        HiberConfiguration.build(configReader);
-
-        testDAO = new TestDAO(HiberConfiguration.getEntityManagerFactory());
-
-        return testDAO;
+        for (Test test : testDAO.getAll()) {
+            System.out.println(test);
+        }
     }
 }
