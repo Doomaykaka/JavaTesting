@@ -1,0 +1,64 @@
+
+plugins {
+    // Apply the application plugin to add support for building a CLI application in Java.
+    id 'application'
+    id 'org.flywaydb.flyway' version '11.9.1'
+}
+
+repositories {
+    // Use Maven Central for resolving dependencies.
+    mavenCentral()
+}
+
+dependencies {
+    // Use JUnit Jupiter for testing.
+    testImplementation libs.junit.jupiter
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // This dependency is used by the application.
+    implementation 'org.hibernate:hibernate-entitymanager:5.0.0.Final'
+    implementation 'org.hibernate:hibernate-core:5.0.0.Final'
+    implementation 'org.hibernate.common:hibernate-commons-annotations:5.0.0.Final'
+    
+    implementation 'org.xerial:sqlite-jdbc:3.50.1.0'
+    
+    implementation 'javax.persistence:javax.persistence-api:2.2'
+    implementation 'javax.xml.bind:jaxb-api:2.0'
+    implementation 'org.javassist:javassist:3.25.0-GA'
+    
+    implementation 'org.flywaydb:flyway-core:11.9.1'
+}
+
+flyway {
+	
+    url = 'jdbc:sqlite:' + System.getProperty('user.dir') + '/app/test.db'
+    user = ''
+    password = ''
+    locations = ['filesystem:' + file("../app/db/migration")]
+	driver = 'org.sqlite.JDBC'
+	cleanDisabled = false
+	createSchemas=true
+	defaultSchema='main'
+}
+
+// Apply a specific Java toolchain to ease working on different environments.
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+run {
+	standardInput = System.in
+}
+
+application {
+    // Define the main class for the application.
+    mainClass = 'flyway.App'
+}
+
+tasks.named('test') {
+    // Use JUnit Platform for unit tests.
+    useJUnitPlatform()
+}
