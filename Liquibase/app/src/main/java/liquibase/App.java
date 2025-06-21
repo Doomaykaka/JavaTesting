@@ -42,7 +42,7 @@ public class App {
 
         TestDAO testDAO = prepareDAO(configReader);
 
-        testFlyway(testDAO, configReader);
+        prepareAndTestFlyway(testDAO, configReader);
     }
 
     private static TestDAO prepareDAO(ApplicationConfigReader configReader) throws FileNotFoundException, IOException {
@@ -56,8 +56,9 @@ public class App {
         return testDAO;
     }
 
-    private static void testFlyway(TestDAO testDAO, ApplicationConfigReader configReader)
-            throws SQLException, LiquibaseException, FileNotFoundException {
+    private static void prepareAndTestFlyway(TestDAO testDAO, ApplicationConfigReader configReader)
+            throws FileNotFoundException, SQLException, LiquibaseException {
+        // Input variables
         final String changelogRootPath = System.getProperty("user.dir");
         final String changelogFolderPath = "/db/changelog/";
         final String changelogFilename = "db-changelog-master.xml";
@@ -75,11 +76,7 @@ public class App {
         File sharedChangelogs = new File(projectRoot, "/db/changelog");
 
         // Create a CompositeResourceAccessor with your desired search paths
-        CompositeResourceAccessor resourceAccessor = new CompositeResourceAccessor(new ClassLoaderResourceAccessor(), // For
-                                                                                                                      // resources
-                                                                                                                      // on
-                                                                                                                      // the
-                                                                                                                      // classpath
+        CompositeResourceAccessor resourceAccessor = new CompositeResourceAccessor(new ClassLoaderResourceAccessor(),
                 new DirectoryResourceAccessor(projectRoot), new DirectoryResourceAccessor(sharedChangelogs));
 
         File changelogFile = new File(changelogFilePath);
@@ -93,6 +90,14 @@ public class App {
         boolean shouldWarnOnMismatchedXsdVersion = false;
         DatabaseChangeLog changeLog = getDatabaseChangeLog(changeLogPath, resourceAccessor, changeLogParameters,
                 shouldWarnOnMismatchedXsdVersion);
+
+        testFlyway(testDAO, changeLogPath, changelogFolderPath, changelogFilename, resourceAccessor, database,
+                changeLog);
+    }
+
+    private static void testFlyway(TestDAO testDAO, String changeLogPath, String changelogFolderPath,
+            String changelogFilename, CompositeResourceAccessor resourceAccessor, Database database,
+            DatabaseChangeLog changeLog) throws SQLException, LiquibaseException, FileNotFoundException {
 
         try (Liquibase liquibase = new Liquibase(changeLogPath, resourceAccessor, database)) {
             // Drop all database
