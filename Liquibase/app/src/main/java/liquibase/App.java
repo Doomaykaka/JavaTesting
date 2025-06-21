@@ -23,6 +23,7 @@ import liquibase.changelog.DatabaseChangeLog;
 import liquibase.command.CommandResults;
 import liquibase.command.CommandScope;
 import liquibase.command.core.DropAllCommandStep;
+import liquibase.command.core.RollbackCommandStep;
 import liquibase.command.core.UpdateCommandStep;
 import liquibase.command.core.helpers.ChangeExecListenerCommandStep;
 import liquibase.command.core.helpers.DatabaseChangelogCommandStep;
@@ -61,9 +62,11 @@ public class App {
         // Input variables
         final String changelogRootPath = System.getProperty("user.dir");
         final String changelogFolderPath = "/db/changelog/";
-        final String changelogFilename = "db-changelog-master.xml";
+        final String changelogFilename = "db-changelog-master.json";
         final String changelogFilePath = changelogFolderPath + changelogFilename;
         final String url = HiberConfiguration.buildDatabaseUrl(configReader);
+
+        System.setProperty("liquibase.duplicateFileMode", "WARN");
 
         Connection connection = DriverManager.getConnection(url, configReader.getDbUser(),
                 configReader.getDbPassword());
@@ -78,16 +81,17 @@ public class App {
         // Create a CompositeResourceAccessor with your desired search paths
         CompositeResourceAccessor resourceAccessor = new CompositeResourceAccessor(new ClassLoaderResourceAccessor(),
                 new DirectoryResourceAccessor(projectRoot), new DirectoryResourceAccessor(sharedChangelogs));
-
-        File changelogFile = new File(changelogFilePath);
+        File changelogFile = new File(sharedChangelogs, changelogFilename);
 
         if (!changelogFile.exists()) {
             System.out.println("Bad changelog file");
+            System.exit(0);
         }
 
         String changeLogPath = changelogFolderPath + changelogFilename;
         ChangeLogParameters changeLogParameters = new ChangeLogParameters(database);
         boolean shouldWarnOnMismatchedXsdVersion = false;
+
         DatabaseChangeLog changeLog = getDatabaseChangeLog(changeLogPath, resourceAccessor, changeLogParameters,
                 shouldWarnOnMismatchedXsdVersion);
 
@@ -100,6 +104,7 @@ public class App {
             DatabaseChangeLog changeLog) throws SQLException, LiquibaseException, FileNotFoundException {
 
         try (Liquibase liquibase = new Liquibase(changeLogPath, resourceAccessor, database)) {
+
             // Drop all database
 
             CommandScope dropAllCommand = new CommandScope(DropAllCommandStep.COMMAND_NAME);
@@ -108,7 +113,7 @@ public class App {
 
             System.out.println("Drop all result");
 
-            System.out.println(dropResult.getCommandScope().getCompleteConfigPrefix());
+            System.out.println(dropResult.getCommandScope().getCommand());
 
             // Update database
 
@@ -125,7 +130,53 @@ public class App {
             updateCommand.addArgumentValue(DatabaseChangelogCommandStep.CHANGELOG_PARAMETERS,
                     new ChangeLogParameters(database));
             updateCommand.addArgumentValue(ShowSummaryArgument.SHOW_SUMMARY, null);
-            updateCommand.execute();
+            CommandResults updateResult = updateCommand.execute();
+
+            System.out.println("Update result");
+
+            System.out.println(updateResult.getCommandScope().getCommand());
+
+            // Rollback
+
+//            CommandScope rollbackCommand = new CommandScope(RollbackCommandStep.COMMAND_NAME);
+//            rollbackCommand.addArgumentValue(DbUrlConnectionCommandStep.DATABASE_ARG, database);
+//            rollbackCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_ARG, changeLog);
+//            rollbackCommand.addArgumentValue(RollbackCommandStep.TAG_ARG, "1.1.0");
+//            CommandResults rollbackResult = rollbackCommand.execute();
+//
+//            System.out.println("Rollback result");
+//
+//            System.out.println(rollbackResult.getCommandScope().getCommand());
+
+            // Report status
+
+            // Diff
+
+            // Changelog sync
+
+            // Generate changelog
+
+            // Calculate checksum
+
+            // Check liquibase tables
+
+            // Clear checksums
+
+            // Force release locks
+
+            // Future rollback sql
+
+            // Generate documentation
+
+            // Is safe to run update
+
+            // Is up to date fast check
+
+            // Mark next change set ran
+
+            // Tag
+
+            // Validate
 
             // Get all tests
 

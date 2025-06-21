@@ -1,0 +1,65 @@
+{
+    "databaseChangeLog": [
+        {
+            "changeSet": {
+                "id": "insert-table-test-sequence-data",
+                "author": "Doomayka",
+                "changes": [
+                    {
+                        "insert": {
+                            "tableName": "test-sequence",
+                            "columns": [
+                                {
+                                    "column": {
+                                        "name": "next_val",
+                                        "valueNumeric": "41"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "changeSet": {
+                "id": "insert-table-test-data",
+                "author": "Doomayka",
+                "changes": [
+                    {
+                        "insert": {
+                            "tableName": "tests",
+                            "columns": [
+                                {
+                                    "column": {
+                                        "name": "id",
+                                        "valueNumeric": "1"
+                                    }
+                                },
+                                {
+                                    "column": {
+                                        "name": "data",
+                                        "value": "Test"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "changeSet": {
+                "id": "create-database-tag",
+                "author": "Doomayka",
+                "changes": [
+                    {
+                        "tagDatabase": {
+                            "tag": "version_1.1.0"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

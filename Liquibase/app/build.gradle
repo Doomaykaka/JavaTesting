@@ -39,8 +39,8 @@ dependencies {
 
 def liquibaseURL = 'jdbc:sqlite:' + System.getProperty('user.dir') + '/app/test.db'
 def liquibaseDriver = 'org.sqlite.JDBC'
-def liquibaseSearchPath = './app'
-def liquibaseChangelogFile = '/src/main/resources/db/changelog/db-changelog-master.xml'
+def liquibaseSearchPath = './app/src/main/resources/db/changelog/'
+def liquibaseChangelogFile = '/db-changelog-master.json'
 def liquibaseReferenceUrl = 'jdbc:sqlite:liquibase.App'
 
 liquibase {

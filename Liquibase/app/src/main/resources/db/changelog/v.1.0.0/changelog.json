@@ -1,0 +1,72 @@
+{
+    "databaseChangeLog": [
+        {
+            "changeSet": {
+                "id": "create-table-test-sequence",
+                "author": "Doomayka",
+                "changes": [
+                    {
+                        "createTable": {
+                            "tableName": "test-sequence",
+                            "columns": [
+                                {
+                                    "column": {
+                                        "name": "next_val",
+                                        "type": "BIGINT"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "changeSet": {
+                "id": "create-table-test",
+                "author": "Doomayka",
+                "changes": [
+                    {
+                        "createTable": {
+                            "tableName": "tests",
+                            "columns": [
+                                {
+                                    "column": {
+                                        "name": "id",
+                                        "type": "BIGINT",
+                                        "constraints": {
+                                            "primaryKey": true,
+                                            "nullable": false
+                                        }
+                                    }
+                                },
+                                {
+                                    "column": {
+                                        "name": "data",
+                                        "type": "VARCHAR",
+                                        "constraints": {
+                                            "nullable": false
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "changeSet": {
+                "id": "create-database-tag",
+                "author": "Doomayka",
+                "changes": [
+                    {
+                        "tagDatabase": {
+                            "tag": "version_1.0.0"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}
