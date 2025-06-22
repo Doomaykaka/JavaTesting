@@ -16,6 +16,12 @@
                                     }
                                 }
                             ]
+                        },
+                        "rollback": {
+                            "delete": {
+                                "tableName": "test-sequence",
+                                "where": "next_val = 41"
+                            }
                         }
                     }
                 ]
@@ -43,6 +49,12 @@
                                     }
                                 }
                             ]
+                        },
+                        "rollback": {
+                            "delete": {
+                                "tableName": "tests",
+                                "where": "id = 1"
+                            }
                         }
                     }
                 ]

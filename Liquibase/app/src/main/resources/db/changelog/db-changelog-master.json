@@ -2,12 +2,14 @@
     "databaseChangeLog": [
         {
             "include": {
-                "file": "/v.1.0.0/changelog.json"
+                "file": "/v.1.0.0/changelog.json",
+                "relativeToChangelogFile": true
             }
         },
         {
             "include": {
-                "file": "/v.1.1.0/changelog.json"
+                "file": "/v.1.1.0/changelog.json",
+                "relativeToChangelogFile": true
             }
         }
     ]

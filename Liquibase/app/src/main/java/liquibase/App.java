@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 
 import liquibase.configuration.HiberConfiguration;
@@ -22,8 +23,13 @@ import liquibase.changelog.ChangeLogParameters;
 import liquibase.changelog.DatabaseChangeLog;
 import liquibase.command.CommandResults;
 import liquibase.command.CommandScope;
+import liquibase.command.core.CalculateChecksumCommandStep;
+import liquibase.command.core.ChangelogSyncCommandStep;
+import liquibase.command.core.DiffCommandStep;
 import liquibase.command.core.DropAllCommandStep;
+import liquibase.command.core.GenerateChangelogCommandStep;
 import liquibase.command.core.RollbackCommandStep;
+import liquibase.command.core.StatusCommandStep;
 import liquibase.command.core.UpdateCommandStep;
 import liquibase.command.core.helpers.ChangeExecListenerCommandStep;
 import liquibase.command.core.helpers.DatabaseChangelogCommandStep;
@@ -95,17 +101,20 @@ public class App {
         DatabaseChangeLog changeLog = getDatabaseChangeLog(changeLogPath, resourceAccessor, changeLogParameters,
                 shouldWarnOnMismatchedXsdVersion);
 
-        testFlyway(testDAO, changeLogPath, changelogFolderPath, changelogFilename, resourceAccessor, database,
-                changeLog);
+        testFlyway(configReader, testDAO, changeLogPath, changelogFolderPath, changelogFilename, resourceAccessor,
+                database, changeLog, sharedChangelogs);
     }
 
-    private static void testFlyway(TestDAO testDAO, String changeLogPath, String changelogFolderPath,
-            String changelogFilename, CompositeResourceAccessor resourceAccessor, Database database,
-            DatabaseChangeLog changeLog) throws SQLException, LiquibaseException, FileNotFoundException {
+    private static void testFlyway(ApplicationConfigReader configReader, TestDAO testDAO, String changeLogPath,
+            String changelogFolderPath, String changelogFilename, CompositeResourceAccessor resourceAccessor,
+            Database database, DatabaseChangeLog changeLog, File sharedChangelogs)
+            throws SQLException, LiquibaseException, FileNotFoundException {
 
         try (Liquibase liquibase = new Liquibase(changeLogPath, resourceAccessor, database)) {
 
             // Drop all database
+
+            System.out.println("Drop all");
 
             CommandScope dropAllCommand = new CommandScope(DropAllCommandStep.COMMAND_NAME);
             dropAllCommand.addArgumentValue(DbUrlConnectionCommandStep.DATABASE_ARG, database);
@@ -113,9 +122,15 @@ public class App {
 
             System.out.println("Drop all result");
 
-            System.out.println(dropResult.getCommandScope().getCommand());
+            String dropAllResultRepr = Arrays.toString(dropResult.getCommandScope().getCommand().getName());
+
+            System.out.println(dropAllResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
 
             // Update database
+
+            System.out.println("Update");
 
             CommandScope updateCommand = new CommandScope(UpdateCommandStep.COMMAND_NAME);
             updateCommand.addArgumentValue(DbUrlConnectionCommandStep.DATABASE_ARG,
@@ -134,29 +149,121 @@ public class App {
 
             System.out.println("Update result");
 
-            System.out.println(updateResult.getCommandScope().getCommand());
+            String updateResultRepr = Arrays.toString(updateResult.getCommandScope().getCommand().getName());
+
+            System.out.println(updateResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
 
             // Rollback
 
-//            CommandScope rollbackCommand = new CommandScope(RollbackCommandStep.COMMAND_NAME);
-//            rollbackCommand.addArgumentValue(DbUrlConnectionCommandStep.DATABASE_ARG, database);
-//            rollbackCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_ARG, changeLog);
-//            rollbackCommand.addArgumentValue(RollbackCommandStep.TAG_ARG, "1.1.0");
-//            CommandResults rollbackResult = rollbackCommand.execute();
-//
-//            System.out.println("Rollback result");
-//
-//            System.out.println(rollbackResult.getCommandScope().getCommand());
+            System.out.println("Rollback");
+
+            CommandScope rollbackCommand = new CommandScope(RollbackCommandStep.COMMAND_NAME);
+            rollbackCommand.addArgumentValue(DbUrlConnectionCommandStep.DATABASE_ARG, database);
+            rollbackCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_ARG, changeLog);
+            rollbackCommand.addArgumentValue(RollbackCommandStep.TAG_ARG, "version_1.0.0");
+            CommandResults rollbackResult = rollbackCommand.execute();
+
+            System.out.println("Rollback result");
+
+            String rollbackResultRepr = Arrays.toString(rollbackResult.getCommandScope().getCommand().getName());
+
+            System.out.println(rollbackResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
 
             // Report status
 
+            System.out.println("Report status");
+
+            CommandScope reportStatusCommand = new CommandScope(StatusCommandStep.COMMAND_NAME);
+            reportStatusCommand.addArgumentValue(DbUrlConnectionCommandStep.DATABASE_ARG, database);
+            reportStatusCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_ARG, changeLog);
+            CommandResults reportStatusResult = reportStatusCommand.execute();
+
+            System.out.println("Report status result");
+
+            String reportStatusResultRepr = Arrays
+                    .toString(reportStatusResult.getCommandScope().getCommand().getName());
+
+            System.out.println(reportStatusResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
+
             // Diff
+
+            System.out.println("Diff");
+
+            CommandScope diffCommand = new CommandScope(DiffCommandStep.COMMAND_NAME);
+            diffCommand.addArgumentValue("referenceUrl", HiberConfiguration.buildDatabaseUrl(configReader));
+            diffCommand.addArgumentValue("url", HiberConfiguration.buildDatabaseUrl(configReader));
+            CommandResults diffResult = diffCommand.execute();
+
+            System.out.println("Diff result");
+
+            String diffResultRepr = Arrays.toString(diffResult.getCommandScope().getCommand().getName());
+
+            System.out.println(diffResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
 
             // Changelog sync
 
+            System.out.println("Changelog sync");
+
+            CommandScope changelogSyncCommand = new CommandScope(ChangelogSyncCommandStep.COMMAND_NAME);
+            changelogSyncCommand.addArgumentValue(DbUrlConnectionCommandStep.DATABASE_ARG, database);
+            changelogSyncCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_ARG, changeLog);
+            CommandResults changelogSyncResult = changelogSyncCommand.execute();
+
+            System.out.println("Changelog sync result");
+
+            String changelogSyncResultRepr = Arrays
+                    .toString(changelogSyncResult.getCommandScope().getCommand().getName());
+
+            System.out.println(changelogSyncResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
+
             // Generate changelog
 
+            System.out.println("Generate changelog");
+
+            CommandScope generateChangelogCommand = new CommandScope(GenerateChangelogCommandStep.COMMAND_NAME);
+            generateChangelogCommand.addArgumentValue("referenceUrl",
+                    HiberConfiguration.buildDatabaseUrl(configReader));
+            generateChangelogCommand.addArgumentValue("url", HiberConfiguration.buildDatabaseUrl(configReader));
+            CommandResults generateChangelogResult = generateChangelogCommand.execute();
+
+            System.out.println("Generate changelog result");
+
+            String generateChangelogResultRepr = Arrays
+                    .toString(generateChangelogResult.getCommandScope().getCommand().getName());
+
+            System.out.println(generateChangelogResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
+
             // Calculate checksum
+
+            System.out.println("Calculate checksum");
+
+            CommandScope calculateChecksumCommand = new CommandScope("calculateChecksum");
+            calculateChecksumCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_FILE_ARG,
+                    (changelogFolderPath + changelogFilename).replace('\\', '/'));
+            calculateChecksumCommand.addArgumentValue("url", HiberConfiguration.buildDatabaseUrl(configReader));
+            calculateChecksumCommand.addArgumentValue("changesetIdentifier", "create-table-test");
+            CommandResults calculateChecksumResult = calculateChecksumCommand.execute();
+
+            System.out.println("Calculate checksum result");
+
+            String calculateChecksumResultRepr = Arrays
+                    .toString(calculateChecksumResult.getCommandScope().getCommand().getName());
+
+            System.out.println(calculateChecksumResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
 
             // Check liquibase tables
 
