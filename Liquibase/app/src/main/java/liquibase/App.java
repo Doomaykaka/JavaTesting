@@ -25,15 +25,25 @@ import liquibase.command.CommandResults;
 import liquibase.command.CommandScope;
 import liquibase.command.core.CalculateChecksumCommandStep;
 import liquibase.command.core.ChangelogSyncCommandStep;
+import liquibase.command.core.ClearChecksumsCommandStep;
+import liquibase.command.core.DbDocCommandStep;
 import liquibase.command.core.DiffCommandStep;
 import liquibase.command.core.DropAllCommandStep;
+import liquibase.command.core.FutureRollbackSqlCommandStep;
 import liquibase.command.core.GenerateChangelogCommandStep;
+import liquibase.command.core.MarkNextChangesetRanCommandStep;
+import liquibase.command.core.ReleaseLocksCommandStep;
 import liquibase.command.core.RollbackCommandStep;
+import liquibase.command.core.SnapshotCommandStep;
 import liquibase.command.core.StatusCommandStep;
+import liquibase.command.core.TagCommandStep;
 import liquibase.command.core.UpdateCommandStep;
+import liquibase.command.core.UpdateTestingRollbackCommandStep;
+import liquibase.command.core.ValidateCommandStep;
 import liquibase.command.core.helpers.ChangeExecListenerCommandStep;
 import liquibase.command.core.helpers.DatabaseChangelogCommandStep;
 import liquibase.command.core.helpers.DbUrlConnectionCommandStep;
+import liquibase.command.core.helpers.ReferenceDbUrlConnectionCommandStep;
 import liquibase.command.core.helpers.ShowSummaryArgument;
 import liquibase.configuration.ApplicationConfigReader;
 import liquibase.dao.TestDAO;
@@ -112,6 +122,9 @@ public class App {
 
         try (Liquibase liquibase = new Liquibase(changeLogPath, resourceAccessor, database)) {
 
+            String changelogFileArgValue = (changelogFolderPath + changelogFilename).replace('\\', '/');
+            String tagCommandName = "tag";
+
             // Drop all database
 
             System.out.println("Drop all");
@@ -136,8 +149,7 @@ public class App {
             updateCommand.addArgumentValue(DbUrlConnectionCommandStep.DATABASE_ARG,
                     DatabaseFactory.getInstance().findCorrectDatabaseImplementation(database.getConnection()));
             updateCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_ARG, changeLog);
-            updateCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_FILE_ARG,
-                    (changelogFolderPath + changelogFilename).replace('\\', '/'));
+            updateCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_FILE_ARG, changelogFileArgValue);
             updateCommand.addArgumentValue(UpdateCommandStep.CONTEXTS_ARG, null);
             updateCommand.addArgumentValue(UpdateCommandStep.LABEL_FILTER_ARG, null);
             updateCommand.addArgumentValue(ChangeExecListenerCommandStep.CHANGE_EXEC_LISTENER_ARG, null);
@@ -196,8 +208,10 @@ public class App {
             System.out.println("Diff");
 
             CommandScope diffCommand = new CommandScope(DiffCommandStep.COMMAND_NAME);
-            diffCommand.addArgumentValue("referenceUrl", HiberConfiguration.buildDatabaseUrl(configReader));
-            diffCommand.addArgumentValue("url", HiberConfiguration.buildDatabaseUrl(configReader));
+            diffCommand.addArgumentValue(ReferenceDbUrlConnectionCommandStep.REFERENCE_URL_ARG,
+                    HiberConfiguration.buildDatabaseUrl(configReader));
+            diffCommand.addArgumentValue(DbUrlConnectionCommandStep.URL_ARG,
+                    HiberConfiguration.buildDatabaseUrl(configReader));
             CommandResults diffResult = diffCommand.execute();
 
             System.out.println("Diff result");
@@ -231,9 +245,10 @@ public class App {
             System.out.println("Generate changelog");
 
             CommandScope generateChangelogCommand = new CommandScope(GenerateChangelogCommandStep.COMMAND_NAME);
-            generateChangelogCommand.addArgumentValue("referenceUrl",
+            generateChangelogCommand.addArgumentValue(ReferenceDbUrlConnectionCommandStep.REFERENCE_URL_ARG,
                     HiberConfiguration.buildDatabaseUrl(configReader));
-            generateChangelogCommand.addArgumentValue("url", HiberConfiguration.buildDatabaseUrl(configReader));
+            generateChangelogCommand.addArgumentValue(DbUrlConnectionCommandStep.URL_ARG,
+                    HiberConfiguration.buildDatabaseUrl(configReader));
             CommandResults generateChangelogResult = generateChangelogCommand.execute();
 
             System.out.println("Generate changelog result");
@@ -250,10 +265,14 @@ public class App {
             System.out.println("Calculate checksum");
 
             CommandScope calculateChecksumCommand = new CommandScope("calculateChecksum");
-            calculateChecksumCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_FILE_ARG,
-                    (changelogFolderPath + changelogFilename).replace('\\', '/'));
-            calculateChecksumCommand.addArgumentValue("url", HiberConfiguration.buildDatabaseUrl(configReader));
-            calculateChecksumCommand.addArgumentValue("changesetIdentifier", "create-table-test");
+            calculateChecksumCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_FILE_ARG, changelogFileArgValue);
+            calculateChecksumCommand.addArgumentValue(DbUrlConnectionCommandStep.URL_ARG,
+                    HiberConfiguration.buildDatabaseUrl(configReader));
+            calculateChecksumCommand.addArgumentValue(CalculateChecksumCommandStep.CHANGESET_ID_ARG,
+                    "create-table-test");
+            calculateChecksumCommand.addArgumentValue(CalculateChecksumCommandStep.CHANGESET_AUTHOR_ARG, "Doomayka");
+            calculateChecksumCommand.addArgumentValue(CalculateChecksumCommandStep.CHANGESET_PATH_ARG,
+                    changelogFolderPath + "/v.1.0.0/changelog.json");
             CommandResults calculateChecksumResult = calculateChecksumCommand.execute();
 
             System.out.println("Calculate checksum result");
@@ -265,25 +284,204 @@ public class App {
 
             System.out.println("-------------------------------------------------");
 
-            // Check liquibase tables
+            // Generate database documentation
+
+            System.out.println("Generate database documentation");
+
+            File outputRootDir = new File(System.getProperty("user.dir"));
+            File outputTempDir = new File(outputRootDir, "build");
+
+            if (!outputTempDir.exists() || !outputTempDir.isDirectory()) {
+                outputTempDir.mkdir();
+            }
+
+            File outputDir = new File(outputTempDir, "databaseDocs");
+
+            if (!outputDir.exists() || !outputDir.isDirectory()) {
+                outputDir.mkdir();
+            }
+
+            CommandScope dbDocCommand = new CommandScope(DbDocCommandStep.COMMAND_NAME);
+            dbDocCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_ARG, changeLog);
+            dbDocCommand.addArgumentValue(DbDocCommandStep.OUTPUT_DIRECTORY_ARG, outputDir.getAbsolutePath());
+            dbDocCommand.addArgumentValue(DbUrlConnectionCommandStep.URL_ARG,
+                    HiberConfiguration.buildDatabaseUrl(configReader));
+            CommandResults dbDocResult = dbDocCommand.execute();
+
+            System.out.println("Generate database documentation result");
+
+            String dbDocResultRepr = Arrays.toString(dbDocResult.getCommandScope().getCommand().getName());
+
+            System.out.println(dbDocResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
 
             // Clear checksums
 
+            System.out.println("Clear checksums");
+
+            CommandScope clearChecksumsCommand = new CommandScope(ClearChecksumsCommandStep.COMMAND_NAME);
+            clearChecksumsCommand.addArgumentValue(DbUrlConnectionCommandStep.URL_ARG,
+                    HiberConfiguration.buildDatabaseUrl(configReader));
+            CommandResults clearChecksumsResult = clearChecksumsCommand.execute();
+
+            System.out.println("Clear checksums result");
+
+            String clearChecksumsResultRepr = Arrays
+                    .toString(clearChecksumsResult.getCommandScope().getCommand().getName());
+
+            System.out.println(clearChecksumsResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
+
             // Force release locks
+
+            System.out.println("Force release locks");
+
+            CommandScope forceReleaseLocksCommand = new CommandScope(ReleaseLocksCommandStep.COMMAND_NAME);
+            forceReleaseLocksCommand.addArgumentValue(DbUrlConnectionCommandStep.URL_ARG,
+                    HiberConfiguration.buildDatabaseUrl(configReader));
+            CommandResults forceReleaseLocksResult = forceReleaseLocksCommand.execute();
+
+            System.out.println("Force release locks result");
+
+            String forceReleaseLocksResultRepr = Arrays
+                    .toString(forceReleaseLocksResult.getCommandScope().getCommand().getName());
+
+            System.out.println(forceReleaseLocksResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
 
             // Future rollback sql
 
-            // Generate documentation
+            System.out.println("Future rollback sql");
+
+            CommandScope futureRollbackSqlCommand = new CommandScope(FutureRollbackSqlCommandStep.COMMAND_NAME);
+            futureRollbackSqlCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_FILE_ARG, changelogFileArgValue);
+            futureRollbackSqlCommand.addArgumentValue(DbUrlConnectionCommandStep.URL_ARG,
+                    HiberConfiguration.buildDatabaseUrl(configReader));
+            CommandResults futureRollbackSqlCommandResult = futureRollbackSqlCommand.execute();
+
+            System.out.println("Future rollback sql result");
+
+            String futureRollbackSqlCommandResultRepr = Arrays
+                    .toString(futureRollbackSqlCommandResult.getCommandScope().getCommand().getName());
+
+            System.out.println(futureRollbackSqlCommandResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
 
             // Is safe to run update
 
-            // Is up to date fast check
+            System.out.println("Is safe to run update");
+
+            CommandScope isSafeToRunUpdateCommand = new CommandScope(UpdateTestingRollbackCommandStep.COMMAND_NAME);
+            isSafeToRunUpdateCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_FILE_ARG, changelogFileArgValue);
+            isSafeToRunUpdateCommand.addArgumentValue(DbUrlConnectionCommandStep.URL_ARG,
+                    HiberConfiguration.buildDatabaseUrl(configReader));
+            CommandResults isSafeToRunUpdateCommandResult = isSafeToRunUpdateCommand.execute();
+
+            System.out.println("Is safe to run update result");
+
+            String isSafeToRunUpdateCommandResultRepr = Arrays
+                    .toString(isSafeToRunUpdateCommandResult.getCommandScope().getCommand().getName());
+
+            System.out.println(isSafeToRunUpdateCommandResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
+
+            // Status
+
+            System.out.println("Status");
+
+            CommandScope statusCommand = new CommandScope(StatusCommandStep.COMMAND_NAME);
+            statusCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_FILE_ARG, changelogFileArgValue);
+            statusCommand.addArgumentValue(DbUrlConnectionCommandStep.URL_ARG,
+                    HiberConfiguration.buildDatabaseUrl(configReader));
+            CommandResults statusCommandResult = statusCommand.execute();
+
+            System.out.println("Status result");
+
+            String statusCommandResultRepr = Arrays
+                    .toString(statusCommandResult.getCommandScope().getCommand().getName());
+
+            System.out.println(statusCommandResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
 
             // Mark next change set ran
 
+            System.out.println("Mark next change set ran");
+
+            CommandScope markNextChangeSetRanCommand = new CommandScope(MarkNextChangesetRanCommandStep.COMMAND_NAME);
+            markNextChangeSetRanCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_FILE_ARG, changelogFileArgValue);
+            markNextChangeSetRanCommand.addArgumentValue(DbUrlConnectionCommandStep.URL_ARG,
+                    HiberConfiguration.buildDatabaseUrl(configReader));
+            CommandResults markNextChangeSetRanCommandResult = markNextChangeSetRanCommand.execute();
+
+            System.out.println("Mark next change set ran result");
+
+            String markNextChangeSetRanCommandResultRepr = Arrays
+                    .toString(markNextChangeSetRanCommandResult.getCommandScope().getCommand().getName());
+
+            System.out.println(markNextChangeSetRanCommandResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
+
             // Tag
 
+            System.out.println("Tag");
+
+            CommandScope tagCommand = new CommandScope(tagCommandName);
+            tagCommand.addArgumentValue(TagCommandStep.TAG_ARG, "New tag");
+            tagCommand.addArgumentValue(DbUrlConnectionCommandStep.URL_ARG,
+                    HiberConfiguration.buildDatabaseUrl(configReader));
+            CommandResults tagCommandResult = tagCommand.execute();
+
+            System.out.println("Tag result");
+
+            String tagCommandResultRepr = Arrays.toString(tagCommandResult.getCommandScope().getCommand().getName());
+
+            System.out.println(tagCommandResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
+
             // Validate
+
+            System.out.println("Validate");
+
+            CommandScope validateCommand = new CommandScope(ValidateCommandStep.COMMAND_NAME);
+            validateCommand.addArgumentValue(UpdateCommandStep.CHANGELOG_FILE_ARG, changelogFileArgValue);
+            validateCommand.addArgumentValue(DbUrlConnectionCommandStep.URL_ARG,
+                    HiberConfiguration.buildDatabaseUrl(configReader));
+            CommandResults validateCommandResult = validateCommand.execute();
+
+            System.out.println("Validate result");
+
+            String validateCommandResultRepr = Arrays
+                    .toString(validateCommandResult.getCommandScope().getCommand().getName());
+
+            System.out.println(validateCommandResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
+
+            // Snapshot
+
+            System.out.println("Snapshot");
+
+            CommandScope snapshotCommand = new CommandScope(SnapshotCommandStep.COMMAND_NAME);
+            snapshotCommand.addArgumentValue(DbUrlConnectionCommandStep.URL_ARG,
+                    HiberConfiguration.buildDatabaseUrl(configReader));
+            CommandResults snapshotCommandResult = snapshotCommand.execute();
+
+            System.out.println("Snapshot result");
+
+            String snapshotCommandResultRepr = Arrays
+                    .toString(snapshotCommandResult.getCommandScope().getCommand().getName());
+
+            System.out.println(snapshotCommandResultRepr + " Success");
+
+            System.out.println("-------------------------------------------------");
 
             // Get all tests
 
