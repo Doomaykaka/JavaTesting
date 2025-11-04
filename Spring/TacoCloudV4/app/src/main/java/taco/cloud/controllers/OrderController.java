@@ -17,7 +17,6 @@ import taco.cloud.models.Ingredient;
 import taco.cloud.models.IngredientRef;
 import taco.cloud.models.Taco;
 import taco.cloud.models.TacoOrder;
-import taco.cloud.repositories.DataJdbcOrderRepository;
 import taco.cloud.repositories.OrderRepository;
 
 @Slf4j
@@ -31,7 +30,6 @@ public class OrderController {
     private OrderRepository orderRepository;
 
     public OrderController(OrderRepository orderRepository) {
-        super();
         this.orderRepository = orderRepository;
     }
 

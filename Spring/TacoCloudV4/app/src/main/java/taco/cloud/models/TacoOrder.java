@@ -6,7 +6,9 @@ import java.util.List;
 
 import org.hibernate.validator.constraints.CreditCardNumber;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
@@ -16,6 +18,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Entity
 @Table
 @AllArgsConstructor
 @NoArgsConstructor
@@ -51,6 +54,7 @@ public class TacoOrder {
 
     private Date placed;
 
+    @OneToMany
     private List<Taco> tacos = new ArrayList<>();
 
     public void addTaco(Taco taco) {

@@ -4,5 +4,5 @@ import org.springframework.data.repository.CrudRepository;
 
 import taco.cloud.models.Ingredient;
 
-public interface DataJdbcOrderRepository extends CrudRepository<Ingredient, Long> {
+public interface JdbcTemplateOrderRepository extends CrudRepository<Ingredient, Long> {
 }

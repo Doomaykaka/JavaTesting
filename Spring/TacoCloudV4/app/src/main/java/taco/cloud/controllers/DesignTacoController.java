@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
@@ -21,6 +20,7 @@ import taco.cloud.models.Ingredient.Type;
 import taco.cloud.models.Taco;
 import taco.cloud.models.TacoOrder;
 import taco.cloud.repositories.IngredientRepository;
+import taco.cloud.repositories.JdbcTemplateIngredientRepository;
 
 @Slf4j
 @Controller
@@ -29,11 +29,12 @@ import taco.cloud.repositories.IngredientRepository;
 public class DesignTacoController {
 
     private final IngredientRepository ingredientRepository;
+    private final JdbcTemplateIngredientRepository ingredientJdbcRepository;
 
-    @Autowired
-    public DesignTacoController(IngredientRepository ingredientRepository) {
-        super();
+    public DesignTacoController(IngredientRepository ingredientRepository,
+            JdbcTemplateIngredientRepository ingredientJdbcRepository) {
         this.ingredientRepository = ingredientRepository;
+        this.ingredientJdbcRepository = ingredientJdbcRepository;
     }
 
     private final String DESIGN_VIEW_NAME = "design-view";
@@ -42,12 +43,26 @@ public class DesignTacoController {
     @ModelAttribute
     public void addIngredientsToModel(Model model) {
         Iterable<Ingredient> ingredients = ingredientRepository.findAll();
+        Iterable<Ingredient> templateIngredients = ingredientJdbcRepository.findAll();
 
         List<Ingredient> ingredientsAsList = new ArrayList<>();
 
         for (Ingredient ingredient : ingredients) {
             ingredientsAsList.add(ingredient);
         }
+
+        List<Ingredient> templateIngredientsAsList = new ArrayList<>();
+
+        for (Ingredient ingredient : templateIngredients) {
+            templateIngredientsAsList.add(ingredient);
+        }
+
+        System.out.println("Repositories is correct: " + ingredientsAsList.containsAll(templateIngredientsAsList));
+        System.out.println("Repositories size: " + ingredientsAsList.size());
+
+        List<Ingredient> ingredientsByName = ingredientJdbcRepository.findByName("Flour Tortilla");
+
+        System.out.println("Ingredient by name" + ingredientsByName.getFirst());
 
         Type[] types = Ingredient.Type.values();
         for (Type type : types) {
